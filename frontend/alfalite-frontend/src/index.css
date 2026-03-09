@@ -1,0 +1,162 @@
+:root {
+  --primary: #ff7303;
+  --primary-hover: #e66700;
+  --primary-glow: rgba(255, 115, 3, 0.25);
+  --bg-dark: #050505;
+  --text-main: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+  --border-glass: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(at 0% 0%, var(--primary-glow) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, var(--primary-glow) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.app-container::before,
+.app-container::after {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: var(--primary);
+  filter: blur(140px);
+  opacity: 0.12;
+  z-index: -1;
+  animation: float 25s infinite alternate ease-in-out;
+}
+
+.app-container::before {
+  top: -150px;
+  left: -150px;
+}
+.app-container::after {
+  bottom: -150px;
+  right: -150px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(150px, 100px) scale(1.1);
+  }
+  100% {
+    transform: translate(-50px, 200px) scale(0.9);
+  }
+}
+
+/* --- CUSTOM SCROLLBAR (ESTILO ALFALITE) --- */
+
+/* 1. Ancho de la barra */
+::-webkit-scrollbar {
+  width: 8px; /* Barra fina y elegante */
+  height: 8px; /* Para scroll horizontal si existiera */
+}
+
+/* 2. El fondo de la barra (Track) */
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02); /* Casi transparente */
+  border-radius: 10px;
+}
+
+/* 3. La parte que se mueve (Thumb) */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 115, 3, 0.3); /* Naranja Alfalite con transparencia */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Crea un efecto de margen */
+  background-clip: content-box; /* Hace que el color no toque los bordes */
+  transition: background 0.3s ease;
+}
+
+/* 4. Efecto al pasar el ratón o hacer scroll */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary); /* Naranja sólido al interactuar */
+}
+
+/* Firefox (Soporte limitado pero útil) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 115, 3, 0.4) rgba(255, 255, 255, 0.02);
+}
+
+/* --- CONTENEDOR DE CARGA --- */
+.loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+  color: var(--primary, #ff7303); /* Color corporativo Alfalite */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+/* --- EL SPINNER ANIMADO --- */
+.loading::before {
+  content: "";
+  width: 50px;
+  height: 50px;
+  margin-bottom: 20px;
+  border: 4px solid rgba(255, 115, 3, 0.1); /* Círculo tenue */
+  border-top: 4px solid var(--primary, #ff7303); /* Parte brillante */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 15px var(--primary-glow, rgba(255, 115, 3, 0.3));
+}
+
+/* --- ANIMACIÓN DE PULSACIÓN EN EL TEXTO --- */
+.loading {
+  animation: pulseText 2s ease-in-out infinite;
+}
+
+/* --- KEYFRAMES --- */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseText {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}

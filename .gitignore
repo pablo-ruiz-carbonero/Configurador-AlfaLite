@@ -1,0 +1,69 @@
+# -------------------------
+# Dependencias
+# -------------------------
+**/node_modules/
+
+# -------------------------
+# Builds
+# -------------------------
+backend/alfalite-backend/dist/
+frontend/alfalite-frontend/dist/
+**/build/
+
+# -------------------------
+# Cache herramientas
+# -------------------------
+**/.cache/
+**/.vite/
+
+# -------------------------
+# TypeScript
+# -------------------------
+*.tsbuildinfo
+
+# -------------------------
+# Variables de entorno
+# -------------------------
+**/.env
+**/.env.*
+!.env.example
+
+# -------------------------
+# Logs
+# -------------------------
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+**/*.log
+
+# -------------------------
+# Testing
+# -------------------------
+coverage/
+
+# -------------------------
+# Archivos temporales
+# -------------------------
+*.tmp
+*.temp
+*.pid
+
+# -------------------------
+# IDE
+# -------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# -------------------------
+# Sistema
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Editor
+# -------------------------
+*.swp
+*.swo
