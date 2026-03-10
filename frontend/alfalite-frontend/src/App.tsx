@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
+import ConfiguratorPage from "./pages/ConfiguratorPage";
 
 // Componente para proteger la ruta
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
@@ -16,7 +17,7 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<div className="loading">Cargando Página...</div>}>
         <Routes>
-          <Route path="/" element={<AuthPage />} />
+          <Route path="/" element={<ConfiguratorPage />} />
           <Route
             path="/dashboard"
             element={
@@ -25,6 +26,7 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/admin" element={<AuthPage />}></Route>
         </Routes>
       </Suspense>
     </BrowserRouter>

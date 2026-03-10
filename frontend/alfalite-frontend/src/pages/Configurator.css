@@ -1,0 +1,348 @@
+/* filepath: frontend/alfalite-frontend/src/pages/Configurator/Configurator.css */
+
+.config-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(600px, 1200px) 320px; /* Centro limitado para mantener columnas visibles */
+  height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-dim);
+  overflow: hidden;
+}
+
+/* utilidad vidrio translúcido */
+.glass-panel {
+  background-color: rgba(20, 20, 20, 0.7);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(10px);
+}
+
+/* Paneles Laterales */
+.config-panel {
+  background-color: rgba(20, 20, 20, 0.7);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border-glass);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+/* Controles de filtro */
+.filter-group label {
+  display: block;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.filter-group select {
+  width: 100%;
+  padding: 6px 8px;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: 6px;
+  color: white;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: var(--primary);
+}
+
+.right-panel {
+  border-right: none;
+  border-left: 1px solid var(--border-glass);
+}
+
+.panel-header {
+  padding: 20px;
+  border-bottom: 1px solid #222;
+}
+
+.panel-header h2 {
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  margin: 0;
+}
+
+.panel-content {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+/* Pasos del Configurador (Acordeones) */
+.config-step {
+  margin-bottom: 15px;
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.7);
+}
+
+.step-title {
+  padding: 12px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #1a1a1a;
+  border-bottom: 1px solid #222;
+}
+
+.step-body {
+  padding: 15px;
+}
+
+/* Área Central (Canvas) */
+.config-main {
+  display: flex;
+  flex-direction: column;
+  background-image: radial-gradient(#1a1a1a 1px, transparent 1px);
+  background-size: 30px 30px; /* Cuadrícula de fondo */
+  position: relative;
+}
+
+.canvas-header,
+.canvas-footer {
+  padding: 15px 30px;
+  background: rgba(15, 15, 15, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Evitar que se comprima */
+}
+
+.model-badge {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.canvas-actions button {
+  margin-left: 10px;
+}
+
+.canvas-area {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.canvas-placeholder {
+  width: 80%;
+  height: 60%;
+  border: 2px dashed var(--border-glass);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-dim);
+  border-radius: 20px;
+}
+
+/* Componentes de UI */
+.placeholder-box {
+  padding: 20px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid var(--border-glass);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.badge {
+  background: var(--primary);
+  color: #000;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.tech-spec-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #222;
+}
+
+.spec-label {
+  color: #888;
+  font-size: 0.9rem;
+}
+.spec-value {
+  font-weight: bold;
+  color: #fff;
+}
+
+.btn-primary-full {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary);
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  padding: 8px 12px;
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+.btn-outline-full {
+  width: 100%;
+  padding: 15px;
+  background: transparent;
+  border: 1px solid #ff7303;
+  color: #ff7303;
+  font-weight: bold;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.quick-stats span {
+  margin-right: 20px;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Lista de productos con scroll */
+.product-selection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 5px;
+}
+
+/* mejorar scrollbar de la lista */
+.product-selection-list::-webkit-scrollbar {
+  width: 6px;
+}
+.product-selection-list::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.product-item-card {
+  display: flex;
+  gap: 10px;
+  padding: 8px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.product-item-card:hover,
+.product-item-card.active {
+  border-color: var(--primary);
+  background: rgba(37, 37, 37, 0.8);
+}
+
+.product-item-card img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.item-info h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.item-info p {
+  margin: 2px 0;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+/* Sliders Naranjas */
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+  margin: 10px 0;
+}
+
+/* Simulación de la Pantalla */
+.visualizer-container {
+  position: relative;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+.led-grid-simulation {
+  border: 2px solid #555;
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 30px rgba(255, 115, 3, 0.2);
+  width: 100%;
+  height: 100%;
+  max-width: 80vw;
+  max-height: 60vh; /* Reducir para dejar espacio al footer */
+  gap: 1px; /* Reducir gap para tiles más juntas */
+  position: relative;
+  z-index: 1;
+  min-height: 300px; /* Tamaño mínimo intuitivo */
+}
+
+.led-grid-simulation.no-bg {
+  background: rgba(0, 0, 0, 0.3); /* Sin imagen si no hay tiles */
+}
+
+.grid-tile {
+  border: 2px solid rgba(255, 255, 255, 0.5); /* Bordes más visibles para sensación de pantalla real */
+  width: 100%;
+  height: 100%;
+  min-width: 20px; /* Tamaño mínimo intuitivo para cada tile */
+  min-height: 20px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5); /* Sombra interna para profundidad */
+  background-repeat: no-repeat;
+}
+
+/* Cotas de medida */
+.measure-h {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ff7303;
+  font-weight: bold;
+}
+.measure-v {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  color: #ff7303;
+  font-weight: bold;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.85rem;
+}

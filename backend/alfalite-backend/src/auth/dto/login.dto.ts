@@ -8,6 +8,6 @@ export class LoginDto {
 
   @ApiProperty({ example: '123456' })
   @IsString()
-  @MinLength(2)
+  @MinLength(1, { message: 'La contraseña debe tener al menos 1 carácter' })
   password: string;
 }

@@ -31,8 +31,7 @@ const initialProductState: Product = {
 
 const Dashboard: React.FC = () => {
   // --- HOOK DE PRODUCTOS ---
-  const { products, loading, error, fetchAll, create, update, remove } =
-    useProducts();
+  const { products, loading, fetchAll, create, update, remove } = useProducts();
 
   // --- ESTADOS DE UI ---
   const [searchTerm, setSearchTerm] = useState("");
