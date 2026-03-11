@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css"; // Asegúrate de importar tu CSS
-import { API_URL } from "../services/apiClient"; // cliente centralizado de la API
+import { API_URL } from "../api/apiClient"; // cliente centralizado de la API
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);

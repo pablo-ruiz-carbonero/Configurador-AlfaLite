@@ -1,6 +1,7 @@
 // filepath: frontend/alfalite-frontend/src/hooks/useProducts.ts
+
 import { useState, useCallback } from "react";
-import { apiFetch } from "../services/apiClient";
+import apiClient from "../api/apiClient";
 
 /**
  * Interfaz de producto compartida con el backend.
@@ -34,40 +35,69 @@ export function useProducts() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Obtener todos los productos
+   */
   const fetchAll = useCallback(async () => {
     setLoading(true);
+
     try {
-      const data = await apiFetch<Product[]>("/api/products");
-      setProducts(data);
+      const res = await apiClient.get<Product[]>("/api/products");
+      setProducts(res.data);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Error desconocido");
+      setError(err?.message || "Error desconocido");
     } finally {
       setLoading(false);
     }
   }, []);
 
+  /**
+   * Crear producto
+   */
   const create = async (p: Product) => {
-    const saved = await apiFetch<Product>("/api/products", {
-      method: "POST",
-      body: JSON.stringify(p),
-    });
-    setProducts((prev) => [...prev, saved]);
-    return saved;
+    try {
+      const res = await apiClient.post<Product>("/api/products", p);
+      const saved = res.data;
+
+      setProducts((prev) => [...prev, saved]);
+
+      return saved;
+    } catch (err: any) {
+      setError(err?.message || "Error creando producto");
+      throw err;
+    }
   };
 
+  /**
+   * Actualizar producto
+   */
   const update = async (id: number, p: Partial<Product>) => {
-    const updated = await apiFetch<Product>(`/api/products/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(p),
-    });
-    setProducts((prev) => prev.map((x) => (x.id === id ? updated : x)));
-    return updated;
+    try {
+      const res = await apiClient.patch<Product>(`/api/products/${id}`, p);
+      const updated = res.data;
+
+      setProducts((prev) => prev.map((x) => (x.id === id ? updated : x)));
+
+      return updated;
+    } catch (err: any) {
+      setError(err?.message || "Error actualizando producto");
+      throw err;
+    }
   };
 
+  /**
+   * Eliminar producto
+   */
   const remove = async (id: number) => {
-    await apiFetch<void>(`/api/products/${id}`, { method: "DELETE" });
-    setProducts((prev) => prev.filter((x) => x.id !== id));
+    try {
+      await apiClient.delete(`/api/products/${id}`);
+
+      setProducts((prev) => prev.filter((x) => x.id !== id));
+    } catch (err: any) {
+      setError(err?.message || "Error eliminando producto");
+      throw err;
+    }
   };
 
   return {
