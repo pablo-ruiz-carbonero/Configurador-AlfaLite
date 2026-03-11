@@ -11,6 +11,14 @@ h2 {
   margin-top: 10px;
 }
 
+.loading-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+}
+
 .grid {
   display: grid;
   width: 90%;
@@ -41,6 +49,10 @@ h2 {
   padding: 8px;
 }
 
+.panel-header {
+  font-size: 0.8rem;
+}
+
 .panel-content {
   display: flex;
   flex-direction: column;
@@ -50,7 +62,10 @@ h2 {
 
 /* filtros arriba */
 .filter-group {
-  margin-bottom: 10px;
+  display: flex; /* activa flexbox */
+  flex-direction: column; /* los hijos van en columna */
+  gap: 10px; /* espacio entre cada filtro */
+  margin-bottom: 10px; /* margen abajo del grupo */
 }
 
 /* lista de productos scrolleable */
@@ -60,7 +75,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 88%;
+  max-height: 80%;
 }
 
 .product-item-card {
@@ -70,6 +85,7 @@ h2 {
   padding: 8px;
   border-radius: 6px;
   cursor: pointer;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 .product-item-card:hover {
@@ -92,28 +108,144 @@ h2 {
 .item-info {
   display: flex;
   flex-direction: column; /* el texto apilado verticalmente */
+  font-size: 0.8rem;
 }
 
 /* -------------------------------
-   OTROS PANELES
+   DIMENSIONS
 ---------------------------------*/
 .Dimensions {
   grid-area: dimensions;
   background-color: rgba(173, 255, 47, 0.5);
   border-radius: 8px;
+
+  display: flex;
+  flex-direction: column; /* apila header y sliders */
+  padding: 16px;
+  height: 100%; /* ocupa todo el espacio del grid */
+  box-sizing: border-box;
+}
+
+/* Header del panel */
+.Dimensions .panel-header {
+  flex: 0 0 auto; /* ocupa solo su altura */
+  margin-bottom: 12px;
+}
+
+/* Contenedor de sliders, ocupa el resto del espacio */
+.dimension-sliders {
+  flex: 1 1 auto; /* crece para ocupar todo el espacio */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* espacio entre grupos */
+  width: 100%; /* ocupa todo el ancho */
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  overflow-y: auto; /* scroll si hay muchos sliders */
+}
+
+/* Cada grupo de slider + input */
+.slider-group {
+  display: flex;
+  flex-direction: column; /* apilar label/select y fila de range + number */
+  gap: 6px;
+  width: 100%;
+}
+
+/* Fila interna para range + número */
+.slider-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  width: 100%;
 }
+
+/* Slider ocupa todo el espacio disponible de la fila */
+.slider-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #ddd;
+  outline: none;
+}
+
+/* Thumb del slider */
+.slider-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+}
+
+/* Número no se estira, fijo */
+.slider-row input[type="number"] {
+  width: 60px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  text-align: center;
+  flex: 0 0 auto; /* no se estira */
+}
+
+/* Label y select */
+.slider-group label,
+.slider-group select {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Radios al final */
+.dimension-sliders .unit-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-top: auto; /* empuja los radios al final */
+}
+
+/* -------------------------------
+  RESULTADOS
+---------------------------------*/
 
 .Results {
   grid-area: results;
   background-color: rgba(255, 255, 224, 0.5);
   border-radius: 8px;
+
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* columna para apilar header + datos */
+  padding: 8px;
+  overflow-y: auto; /* scroll si hay muchos datos */
 }
+
+.results-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  width: 100%;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+
+.result-row span {
+  color: #333;
+}
+
+.result-row strong {
+  font-weight: 600;
+}
+
+/* -------------------------------
+   OTROS PANELES
+---------------------------------*/
 
 .Canvas {
   grid-area: canvas;

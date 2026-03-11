@@ -9,24 +9,24 @@ interface Props {
 function ProductFilters({ filters, setFilters }: Props) {
   return (
     <div className="filter-group">
-      <label>Localización</label>
+      <label>Locatation: </label>
       <select
         value={filters.location}
         onChange={(e) => setFilters({ ...filters, location: e.target.value })}
       >
-        <option value="All">Todos</option>
+        <option value="All">All</option>
         <option value="Indoor">Indoor</option>
         <option value="Outdoor">Outdoor</option>
       </select>
 
-      <label>Aplicación</label>
+      <label>Application</label>
       <select
         value={filters.application}
         onChange={(e) =>
           setFilters({ ...filters, application: e.target.value })
         }
       >
-        <option value="All">Todos</option>
+        <option value="All">All</option>
         <option value="Rental">Rental</option>
         <option value="Fixed">Fixed Install</option>
         <option value="Broadcast">Broadcast</option>

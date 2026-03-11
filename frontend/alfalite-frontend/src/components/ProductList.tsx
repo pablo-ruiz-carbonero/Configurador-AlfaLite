@@ -41,20 +41,14 @@ function ProductList({
             <h4>{p.name}</h4>
 
             <p>
-              {p.pixelPitch}mm | {p.horizontal}x{p.vertical}px
+              Resolution {p.horizontal}x{p.vertical}px
             </p>
+
+            <p>Pixel pitch: {p.pixelPitch}mm</p>
 
             <span className="badge">
               {Array.isArray(p.location) ? p.location.join(", ") : p.location}
             </span>
-
-            {p.application && p.application.length > 0 && (
-              <span className="badge">
-                {Array.isArray(p.application)
-                  ? p.application.join(", ")
-                  : p.application}
-              </span>
-            )}
           </div>
         </div>
       ))}
