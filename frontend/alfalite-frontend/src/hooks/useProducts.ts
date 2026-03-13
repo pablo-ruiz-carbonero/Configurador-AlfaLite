@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import * as productApi from "../api/products";
-import type { Product } from "./useProductsWithCRUD";
+import type { Product } from "../types/product";
 
 export function useProductsConfigurator() {
   const [products, setProducts] = useState<Product[]>([]);

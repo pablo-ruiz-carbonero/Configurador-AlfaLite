@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import "./Configurator.css";
 import { useProductsConfigurator } from "../hooks/useProducts";
-import type { Product } from "../hooks/useProductsWithCRUD";
+import type { Product } from "../types/product";
 import ProductList from "../components/ProductList";
 import ProductFilters from "../components/ProductFilters";
 import DimensionControls from "../components/DimensionsControls";

@@ -1,25 +1,30 @@
 import apiClient from "./apiClient";
-import type { Product } from "../hooks/useProductsWithCRUD";
+import type { Product } from "../types/product";
+
+// El interceptor de apiClient ya devuelve response.data directamente.
+// Por eso NO hay que hacer .data — el resultado ya es el payload.
 
 export const getProducts = async (): Promise<Product[]> => {
-  const res = await apiClient.get<Product[]>("/api/dashboard/products");
-  return res.data; // aquí sí usamos .data porque el interceptor devuelve todo AxiosResponse
+  return apiClient.get("/api/dashboard/products") as unknown as Promise<
+    Product[]
+  >;
 };
 
 export const createProduct = async (product: Product): Promise<Product> => {
-  const res = await apiClient.post<Product>("/api/dashboard/products", product);
-  return res.data;
+  return apiClient.post(
+    "/api/dashboard/products",
+    product,
+  ) as unknown as Promise<Product>;
 };
 
 export const updateProduct = async (
   id: number,
   data: Partial<Product>,
 ): Promise<Product> => {
-  const res = await apiClient.patch<Product>(
+  return apiClient.patch(
     `/api/dashboard/products/${id}`,
     data,
-  );
-  return res.data;
+  ) as unknown as Promise<Product>;
 };
 
 export const deleteProduct = async (id: number): Promise<void> => {

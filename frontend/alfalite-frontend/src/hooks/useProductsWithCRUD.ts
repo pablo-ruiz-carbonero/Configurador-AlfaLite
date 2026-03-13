@@ -1,28 +1,6 @@
 import { useState, useCallback } from "react";
 import * as productApi from "../api/productsWithCRUD";
-
-/** * Interfaz de producto compartida con el backend. * Sólo se incluyen los campos que actualmente se usan en la UI. */ export interface Product {
-  id?: number;
-  name: string;
-  location: string[];
-  application: string[];
-  horizontal: number;
-  vertical: number;
-  pixelPitch: number;
-  width: number;
-  height: number;
-  depth: number;
-  consumption: number;
-  weight: number;
-  brightness: number;
-  refreshRate?: number;
-  contrast?: string;
-  visionAngle?: string;
-  redundancy?: string;
-  curvedVersion?: string;
-  opticalMultilayerInjection?: string;
-  image?: string;
-}
+import type { Product } from "../types/product";
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -33,11 +11,11 @@ export function useProducts() {
     setLoading(true);
     try {
       const data = await productApi.getProducts();
-      setProducts(data || []); // seguro que no es undefined
+      setProducts(data || []);
       setError(null);
     } catch (err: any) {
       setError(err?.message || "Error desconocido");
-      setProducts([]); // fallback seguro
+      setProducts([]);
     } finally {
       setLoading(false);
     }

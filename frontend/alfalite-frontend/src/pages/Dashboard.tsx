@@ -4,10 +4,9 @@ import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import logo from "../assets/logo_horizontal_peq.webp";
 
-// Hook que centraliza la lógica de la API
 import { useProducts } from "../hooks/useProductsWithCRUD";
-import type { Product } from "../hooks/useProductsWithCRUD";
-// Estado inicial para limpiar el formulario
+import type { Product } from "../types/product";
+
 const initialProductState: Product = {
   name: "",
   location: [],
@@ -20,7 +19,7 @@ const initialProductState: Product = {
   depth: 0,
   consumption: 0,
   weight: 0,
-  refreshRate: 0, // Campo Hz
+  refreshRate: 0,
   contrast: "",
   visionAngle: "",
   redundancy: "",
@@ -30,16 +29,13 @@ const initialProductState: Product = {
 };
 
 const Dashboard: React.FC = () => {
-  // --- HOOK DE PRODUCTOS ---
   const { products, loading, getAll, create, update, remove } = useProducts();
 
-  // --- ESTADOS DE UI ---
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null); // Modal "Ver más"
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false); // Modal Crear/Editar
-  const [productToDelete, setProductToDelete] = useState<number | null>(null); // Modal Confirmación
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<number | null>(null);
 
-  // --- ESTADOS DE FORMULARIO ---
   const [formData, setFormData] = useState<Product>(initialProductState);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -47,28 +43,23 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("alfalite_token");
 
-  // --- EFECTO INICIAL ---
   useEffect(() => {
-    if (!token) navigate("/");
+    if (!token) navigate("/admin");
     else getAll();
   }, [token, navigate, getAll]);
 
-  // --- VALIDACIÓN DE FORMULARIO ---
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio";
     if (formData.pixelPitch <= 0) newErrors.pixelPitch = "Pitch inválido";
     if (formData.brightness <= 0) newErrors.brightness = "Brillo obligatorio";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // --- HANDLERS: CRUD ---
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-
     try {
       if (isEditing && formData.id) {
         await update(formData.id, formData);
@@ -76,7 +67,7 @@ const Dashboard: React.FC = () => {
         await create(formData);
       }
       closeFormModal();
-      getAll(); // Refrescar lista
+      getAll();
     } catch (err) {
       console.error("Error al guardar:", err);
     }
@@ -87,13 +78,12 @@ const Dashboard: React.FC = () => {
     try {
       await remove(productToDelete);
       setProductToDelete(null);
-      getAll(); // Refrescar lista
+      getAll();
     } catch (err) {
       console.error("Error al borrar:", err);
     }
   };
 
-  // --- HANDLERS: MODALES ---
   const openCreateModal = () => {
     setFormData(initialProductState);
     setIsEditing(false);
@@ -112,12 +102,10 @@ const Dashboard: React.FC = () => {
     setErrors({});
   };
 
-  // --- HANDLERS: INPUTS ---
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setFormData({
       ...formData,
-      // Solución al problema de números/Hz: Si está vacío, ponemos 0
       [name]: type === "number" ? (value === "" ? 0 : Number(value)) : value,
     });
     if (errors[name]) setErrors({ ...errors, [name]: "" });
@@ -131,7 +119,6 @@ const Dashboard: React.FC = () => {
     });
   };
 
-  // Helper para renderizar inputs con placeholders y validación
   const renderInput = (
     label: string,
     name: string,
@@ -146,7 +133,7 @@ const Dashboard: React.FC = () => {
         name={name}
         step={step}
         placeholder={placeholder}
-        value={(formData as any)[name] || ""}
+        value={(formData as any)[name] ?? ""}
         onChange={handleInputChange}
         className={errors[name] ? "input-error" : ""}
       />
@@ -154,10 +141,10 @@ const Dashboard: React.FC = () => {
     </div>
   );
 
-  // --- FILTRO DE BÚSQUEDA ---
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
   if (loading && products.length === 0) {
     return (
       <div className="loading">
@@ -168,7 +155,6 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="app-container dashboard-vertical">
-      {/* NAVEGACIÓN */}
       <nav className="top-nav glass-panel">
         <div className="logo">
           <img src={logo} alt="Alfalite" />
@@ -186,7 +172,6 @@ const Dashboard: React.FC = () => {
         </button>
       </nav>
 
-      {/* GRID DE PRODUCTOS */}
       <div className="cards-grid">
         {filtered.map((p) => (
           <div
@@ -198,7 +183,7 @@ const Dashboard: React.FC = () => {
               <img
                 src={
                   p.image
-                    ? `http://localhost:1337/${p.image}`
+                    ? `${API_BASE_URL}/${p.image}`
                     : "https://via.placeholder.com/300x200?text=Alfalite"
                 }
                 alt={p.name}
@@ -228,7 +213,6 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* MODAL: FORMULARIO COMPLETO */}
       {isFormModalOpen && (
         <div className="modal-overlay" onClick={closeFormModal}>
           <div
@@ -312,13 +296,15 @@ const Dashboard: React.FC = () => {
                   "number",
                   "0.01",
                 )}
+                {/* FIX: era "refresh_rate" → correcto es "refreshRate" */}
                 {renderInput(
                   "Tasa Refresco (Hz)",
-                  "refresh_rate",
+                  "refreshRate",
                   "Ej: 3840",
                   "number",
                 )}
-                {renderInput("Contraste", "constrat", "Ej: 5000:1")}
+                {/* FIX: era "constrat" (typo) → correcto es "contrast" */}
+                {renderInput("Contraste", "contrast", "Ej: 5000:1")}
                 {renderInput("Ángulo de Visión", "visionAngle", "Ej: 160º")}
                 {renderInput("Redundancia", "redundancy", "Ej: Sí / No")}
                 {renderInput("Versión Curva", "curvedVersion", "Ej: +/- 15º")}
@@ -336,7 +322,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL: CONFIRMACIÓN DE BORRADO */}
       {productToDelete && (
         <div className="modal-overlay" onClick={() => setProductToDelete(null)}>
           <div
@@ -363,7 +348,6 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* MODAL: VER DETALLES */}
       {selectedProduct && (
         <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
           <div
@@ -381,7 +365,7 @@ const Dashboard: React.FC = () => {
               {selectedProduct.image && (
                 <div className="product-image-container">
                   <img
-                    src={`http://localhost:1337/${selectedProduct.image}`}
+                    src={`${API_BASE_URL}/${selectedProduct.image}`}
                     alt={selectedProduct.name}
                     className="product-image"
                   />
@@ -397,12 +381,10 @@ const Dashboard: React.FC = () => {
                   {selectedProduct.application.join(", ")}
                 </div>
                 <div>
-                  <strong>Píxeles Horizontales:</strong>{" "}
-                  {selectedProduct.horizontal}
+                  <strong>Píxeles H:</strong> {selectedProduct.horizontal}
                 </div>
                 <div>
-                  <strong>Píxeles Verticales:</strong>{" "}
-                  {selectedProduct.vertical}
+                  <strong>Píxeles V:</strong> {selectedProduct.vertical}
                 </div>
                 <div>
                   <strong>Pixel Pitch:</strong> {selectedProduct.pixelPitch}mm
@@ -467,5 +449,8 @@ const Dashboard: React.FC = () => {
     </div>
   );
 };
+
+// Importar la URL base para las imágenes (en lugar de hardcodear localhost)
+import { API_BASE_URL } from "../api/apiClientPublic";
 
 export default Dashboard;
