@@ -4,7 +4,8 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm/dist/typeorm.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ApiModule } from './api/api.module';
+import { ApiModule } from './api/Dashboard/api.module';
+import { ApiModule as ConfiguratorApiModule } from './api/Configurator/api.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ApiModule } from './api/api.module';
     // 3. Tus módulos
     AuthModule,
     ApiModule,
+    ConfiguratorApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

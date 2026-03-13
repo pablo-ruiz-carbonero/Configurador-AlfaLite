@@ -8,10 +8,7 @@ export class CreateApiDto {
   @ApiProperty() @IsNumber() horizontal: number;
   @ApiProperty() @IsNumber() vertical: number;
 
-  // el backend almacena pixel_pitch en la BD, pero aquí usamos camelCase
-  @ApiProperty({ name: 'pixelPitch' })
-  @IsNumber()
-  pixelPitch: number;
+  @ApiProperty() @IsNumber() pixelPitch: number;
 
   @ApiProperty() @IsNumber() width: number;
   @ApiProperty() @IsNumber() height: number;
@@ -20,11 +17,26 @@ export class CreateApiDto {
   @ApiProperty() @IsNumber() weight: number;
   @ApiProperty() @IsNumber() brightness: number;
 
-  @ApiProperty({ required: false, name: 'refreshRate' })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
   refreshRate?: number;
-
   @ApiProperty({ required: false }) @IsOptional() @IsString() contrast?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  visionAngle?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  redundancy?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  curvedVersion?: string;
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  opticalMultilayerInjection?: string;
   @ApiProperty({ required: false }) @IsOptional() @IsString() image?: string;
 }

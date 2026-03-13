@@ -13,19 +13,18 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ApiService } from './api.service';
 import { CreateApiDto } from './dto/create-api.dto';
 import { UpdateApiDto } from './dto/update-api.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth-guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth-guard';
 
-@ApiTags('products')
+/**
+ * Ruta PROTEGIDA — usada por el dashboard con JWT.
+ * Todas las operaciones requieren token: GET, POST, PATCH, DELETE.
+ */
+@ApiTags('dashboard')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard) // <--- Protege todo el CRUD
-@Controller('api/products')
-export class ApiController {
+@UseGuards(JwtAuthGuard)
+@Controller('api/dashboard/products')
+export class DashboardController {
   constructor(private readonly apiService: ApiService) {}
-
-  @Post()
-  create(@Body() createApiDto: CreateApiDto) {
-    return this.apiService.create(createApiDto);
-  }
 
   @Get()
   findAll() {
@@ -35,6 +34,11 @@ export class ApiController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.apiService.findOne(id);
+  }
+
+  @Post()
+  create(@Body() createApiDto: CreateApiDto) {
+    return this.apiService.create(createApiDto);
   }
 
   @Patch(':id')

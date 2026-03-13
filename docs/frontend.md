@@ -52,6 +52,12 @@ Crea un fichero `.env` en la raíz del proyecto con dicha variable.
 - Añadidos comentarios y validaciones básicas de formulario con mensajes.
 - Se creó `src/services/apiClient.ts` que centraliza todas las llamadas `fetch` y maneja tokens/errores.
 - Se introdujo el hook `useProducts` (`src/hooks/useProducts.ts`) para separar la lógica de peticiones y estado de los componentes.
+  - ahora internamente utiliza un hook genérico `useApi` (`src/hooks/useApi.ts`) que abstrae la carga inicial,
+    el estado `loading`/`error` y la recarga (`refetch`). Esto evita duplicar código cuando se añadan
+    otros endpoints y resuelve el bug del «bucle infinito» de carga porque la petición se dispara
+    **una sola vez** al montar el hook.
+- El cliente HTTP (`apiClient`) está tipado para devolver directamente `T` en vez de
+  `AxiosResponse<T>`, por lo que no es necesario acceder a `.data` en cada llamada.
 - Todos los `fetch` comprueban `response.ok` y redirigen en caso de 401.
 
 ### Ideas de ampliación
