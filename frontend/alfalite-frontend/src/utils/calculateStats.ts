@@ -26,39 +26,40 @@ export function calculateStats(
 ): Stats {
   const totalTiles = tilesH * tilesV;
 
-  // tamaño en metros
+  // dimensiones base en metros
   const widthM = (tilesH * product.width) / 1000;
   const heightM = (tilesV * product.height) / 1000;
 
-  // resolución total
+  const diagonalM = Math.sqrt(widthM ** 2 + heightM ** 2);
+  const areaM = widthM * heightM;
+
   const resH = tilesH * product.horizontal;
   const resV = tilesV * product.vertical;
 
-  // relación de aspecto
   const aspect = (resH / resV).toFixed(2);
 
-  // superficie y diagonal
-  const area = widthM * heightM;
-  const diagonal = Math.sqrt(widthM ** 2 + heightM ** 2);
-
-  // peso y consumo
   const weight = totalTiles * product.weight;
   const powerMax = totalTiles * product.consumption;
   const powerAvg = powerMax * 0.35;
   const btu = powerMax * 3.412;
 
-  // factor de conversión a pies
-  const factor = unit === "ft" ? 3.28084 : 1;
+  // conversión
+  const mToFt = 3.28084;
+
+  const width = unit === "ft" ? widthM * mToFt : widthM;
+  const height = unit === "ft" ? heightM * mToFt : heightM;
+  const diagonal = unit === "ft" ? diagonalM * mToFt : diagonalM;
+  const area = unit === "ft" ? areaM * mToFt * mToFt : areaM;
 
   return {
     totalTiles,
-    widthM: widthM * factor,
-    heightM: heightM * factor,
-    diagonal: diagonal * factor,
+    widthM: width,
+    heightM: height,
+    diagonal,
     resH,
     resV,
     aspect,
-    area: area * factor ** 2,
+    area,
     weight,
     powerMax,
     powerAvg,

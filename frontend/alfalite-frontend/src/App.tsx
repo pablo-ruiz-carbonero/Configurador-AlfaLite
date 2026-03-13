@@ -6,7 +6,21 @@ import ConfiguratorPage from "./pages/ConfiguratorPage";
 // Componente para proteger la ruta
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("alfalite_token");
-  return token ? children : <Navigate to="/" />;
+  if (!token) return <Navigate to="/admin" />;
+
+  // Validación básica: decodificar JWT (sin librería)
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (payload.exp < Date.now() / 1000) {
+      localStorage.removeItem("alfalite_token");
+      return <Navigate to="/admin" />;
+    }
+  } catch {
+    localStorage.removeItem("alfalite_token");
+    return <Navigate to="/admin" />;
+  }
+
+  return children;
 };
 
 const AuthPage = lazy(() => import("./pages/Auth"));

@@ -5,8 +5,8 @@ import "./Dashboard.css";
 import logo from "../assets/logo_horizontal_peq.webp";
 
 // Hook que centraliza la lógica de la API
-import { useProducts, type Product } from "../hooks/useProducts";
-
+import { useProducts } from "../hooks/useProductsWithCRUD";
+import type { Product } from "../hooks/useProductsWithCRUD";
 // Estado inicial para limpiar el formulario
 const initialProductState: Product = {
   name: "",
@@ -31,7 +31,7 @@ const initialProductState: Product = {
 
 const Dashboard: React.FC = () => {
   // --- HOOK DE PRODUCTOS ---
-  const { products, loading, fetchAll, create, update, remove } = useProducts();
+  const { products, loading, getAll, create, update, remove } = useProducts();
 
   // --- ESTADOS DE UI ---
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,8 +50,8 @@ const Dashboard: React.FC = () => {
   // --- EFECTO INICIAL ---
   useEffect(() => {
     if (!token) navigate("/");
-    else fetchAll();
-  }, [token, navigate, fetchAll]);
+    else getAll();
+  }, [token, navigate, getAll]);
 
   // --- VALIDACIÓN DE FORMULARIO ---
   const validateForm = () => {
@@ -76,7 +76,7 @@ const Dashboard: React.FC = () => {
         await create(formData);
       }
       closeFormModal();
-      fetchAll(); // Refrescar lista
+      getAll(); // Refrescar lista
     } catch (err) {
       console.error("Error al guardar:", err);
     }
@@ -87,7 +87,7 @@ const Dashboard: React.FC = () => {
     try {
       await remove(productToDelete);
       setProductToDelete(null);
-      fetchAll(); // Refrescar lista
+      getAll(); // Refrescar lista
     } catch (err) {
       console.error("Error al borrar:", err);
     }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css"; // Asegúrate de importar tu CSS
-import { API_URL } from "../api/apiClient"; // cliente centralizado de la API
+import { API_BASE_URL } from "../api/apiClient"; // cliente centralizado de la API
 
 const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -16,7 +16,7 @@ const AuthPage: React.FC = () => {
     const endpoint = isLogin ? "/auth/login" : "/auth/register";
 
     try {
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

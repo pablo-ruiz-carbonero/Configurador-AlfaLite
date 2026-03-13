@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 interface Props {
   tilesH: number;
   tilesV: number;
@@ -15,14 +17,20 @@ function DimensionControls({
   unit,
   setUnit,
 }: Props) {
+  const [tilesHInput, setTilesHInput] = useState(String(tilesH));
+  const [tilesVInput, setTilesVInput] = useState(String(tilesV));
+
+  useEffect(() => setTilesHInput(String(tilesH)), [tilesH]);
+  useEffect(() => setTilesVInput(String(tilesV)), [tilesV]);
+
   return (
     <div className="dimension-sliders">
-      {/* Grupo 1 */}
+      {/* VERTICAL */}
       <div className="slider-group">
         <select>
-          <option value="Tiles vertical">Tiles vertical</option>
-          <option value="Height">Height</option>
-          <option value="Aspect ratio">Aspect ratio</option>
+          <option>Tiles vertical</option>
+          <option>Height</option>
+          <option>Aspect ratio</option>
         </select>
 
         <div className="slider-row">
@@ -33,30 +41,32 @@ function DimensionControls({
             value={tilesH}
             onChange={(e) => setTilesH(parseInt(e.target.value))}
           />
+
           <input
             type="number"
             min={1}
             max={100}
-            value={tilesH}
+            value={tilesHInput}
             onChange={(e) => {
               const val = e.target.value;
-              if (val === "") setTilesH(1);
-              else {
-                const num = parseInt(val);
-                if (!isNaN(num)) setTilesH(Math.min(Math.max(num, 1), 100));
+              setTilesHInput(val);
+
+              const num = parseInt(val);
+              if (!isNaN(num)) {
+                setTilesH(Math.min(Math.max(num, 1), 100));
               }
             }}
           />
         </div>
       </div>
 
-      {/* Grupo 2 */}
+      {/* HORIZONTAL */}
       <div className="slider-group">
         <select>
-          <option value="Tiles horizontal">Tiles horizontal</option>
-          <option value="Width">Width</option>
-          <option value="Surface">Surface</option>
-          <option value="Diagonal">Diagonal</option>
+          <option>Tiles horizontal</option>
+          <option>Width</option>
+          <option>Surface</option>
+          <option>Diagonal</option>
         </select>
 
         <div className="slider-row">
@@ -67,24 +77,26 @@ function DimensionControls({
             value={tilesV}
             onChange={(e) => setTilesV(parseInt(e.target.value))}
           />
+
           <input
             type="number"
             min={1}
             max={100}
-            value={tilesV}
+            value={tilesVInput}
             onChange={(e) => {
               const val = e.target.value;
-              if (val === "") setTilesV(1);
-              else {
-                const num = parseInt(val);
-                if (!isNaN(num)) setTilesV(Math.min(Math.max(num, 1), 100));
+              setTilesVInput(val);
+
+              const num = parseInt(val);
+              if (!isNaN(num)) {
+                setTilesV(Math.min(Math.max(num, 1), 100));
               }
             }}
           />
         </div>
       </div>
 
-      {/* Radios Meters / Feet */}
+      {/* UNITS */}
       <div className="unit-selector">
         <label>
           <input
@@ -96,6 +108,7 @@ function DimensionControls({
           />
           Meters
         </label>
+
         <label>
           <input
             type="radio"

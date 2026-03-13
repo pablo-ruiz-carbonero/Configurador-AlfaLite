@@ -1,18 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
 import "./Configurator.css";
-import { useProducts, type Product } from "../hooks/useProducts";
+import { useProductsConfigurator } from "../hooks/useProducts";
+import type { Product } from "../hooks/useProductsWithCRUD";
 import ProductList from "../components/ProductList";
 import ProductFilters from "../components/ProductFilters";
 import DimensionControls from "../components/DimensionsControls";
 import ResultsData from "../components/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
+import ScreenCanvas from "../components/ScreenCanvas";
+import imageTest from "../assets/fotoDeEjemplo.jpg";
 
 function ConfiguratorPage() {
-  const { products, loading, fetchAll } = useProducts();
+  const { products, loading, getAll } = useProductsConfigurator();
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    getAll();
+  }, []);
 
   const [filters, setFilters] = useState({
     location: "All",
@@ -103,10 +106,20 @@ function ConfiguratorPage() {
               />
             )}
           </section>
-
           {/* PANEL CANVAS */}
           <section className="Canvas">
-            <p>Canvas</p>
+            <div className="panel-header">
+              <h2>4. Canvas</h2>
+            </div>
+
+            {selectedProduct && (
+              <ScreenCanvas
+                tilesH={tilesH}
+                tilesV={tilesV}
+                image={imageTest}
+                product={selectedProduct}
+              />
+            )}
           </section>
         </div>
       </main>

@@ -1,51 +1,36 @@
-// filepath: frontend/alfalite-frontend/src/services/apiClient.ts
-
-/**
- * Cliente HTTP basado en Axios para consumir la API.
- *
- * - Lee la URL base de VITE_API_URL
- * - Inserta automáticamente el token guardado en localStorage
- * - Detecta 401 y fuerza logout
- * - Devuelve directamente res.data
- */
-
 import axios from "axios";
 
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:1337"; // URL base de la API, configurable vía .env
 
 const apiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
   },
 });
 
-/**
- * Request interceptor
- * Inserta automáticamente el token
- */
+// Interceptores para manejar tokens y errores globales
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("alfalite_token");
-
+  if (!token) {
+    return Promise.reject({ message: "No autorizado" });
+  }
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
 
-/**
- * Response interceptor
- * Maneja errores globales
- */
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => response.data, // devuelve solo el payload
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("alfalite_token");
-      window.location.href = "/";
+      window.location.href = "/admin"; // redirige a login si no autorizado
     }
-
     return Promise.reject(error.response?.data || error.message || "API Error");
   },
 );
