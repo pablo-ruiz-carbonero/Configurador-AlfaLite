@@ -1,289 +1,349 @@
-.container {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
+/* =============================================
+   CONFIGURATOR – global layout
+   ============================================= */
 
-h2 {
+.page-title {
   text-align: center;
-  margin-top: 10px;
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin: 16px 0 12px;
 }
 
-.loading-container {
-  height: 100vh;
+.configurator-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
+  padding: 0 16px 32px;
+  box-sizing: border-box;
 }
 
-.grid {
+/* 3-col top row, canvas spans cols 2-3 on bottom */
+.cfg-grid {
   display: grid;
-  width: 90%;
-  height: 80vh;
-
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-
+  width: 100%;
+  max-width: 1200px;
+  grid-template-columns: 280px 1fr 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     "product dimensions results"
-    "product canvas canvas";
-
-  gap: 16px;
-  padding: 8px;
-  border-radius: 8px;
+    "product canvas    canvas";
+  gap: 12px;
+  min-height: 620px;
 }
 
-/* -------------------------------
-   PANEL PRODUCTOS (IZQUIERDO)
----------------------------------*/
-.ContainerChooseAProduct {
-  grid-area: product;
-  background-color: rgba(255, 182, 193, 0.5);
-  border-radius: 8px;
+/* =============================================
+   PANELS – shared
+   ============================================= */
+.cfg-panel {
+  border: 1.5px solid #e57c2a;
+  border-radius: 6px;
   display: flex;
-  flex-direction: column; /* para apilar filtros + lista + sliders */
-  height: 100%;
-  padding: 8px;
+  flex-direction: column;
+  background: var(--border-glass);
+  overflow: hidden;
 }
 
 .panel-header {
-  font-size: 0.8rem;
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid #f0dac8;
 }
 
-.panel-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.panel-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.panel-body {
   flex: 1;
-}
-
-/* filtros arriba */
-.filter-group {
-  display: flex; /* activa flexbox */
-  flex-direction: column; /* los hijos van en columna */
-  gap: 10px; /* espacio entre cada filtro */
-  margin-bottom: 10px; /* margen abajo del grupo */
-}
-
-/* lista de productos scrolleable */
-.lista-de-productos {
-  flex: 1; /* ocupa todo el espacio disponible */
-  overflow-y: auto; /* scroll vertical si hay muchos items */
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  max-height: 80%;
+  padding: 10px;
+  overflow: hidden; /* clips to panel — children use overflow-y: auto for their own scroll */
+  min-height: 0;
+}
+
+/* Product panel body: allow the list to scroll within the panel */
+.panel-product .panel-body {
+  overflow: hidden;
+  height: 100%;
+}
+
+.panel-body--canvas {
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.cfg-placeholder {
+  color: #999;
+  font-size: 13px;
+  text-align: center;
+  margin: auto;
+}
+
+.cfg-loading {
+  color: #999;
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+/* =============================================
+   PANEL AREAS
+   ============================================= */
+.panel-product {
+  grid-area: product;
+  /* Span both rows but cap height so the list can scroll */
+  max-height: 620px;
+  overflow: hidden;
+}
+.panel-dimensions {
+  grid-area: dimensions;
+}
+.panel-results {
+  grid-area: results;
+  overflow-y: auto;
+}
+.panel-canvas {
+  grid-area: canvas;
+}
+
+/* =============================================
+   1. PRODUCT LIST
+   ============================================= */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+.filter-group label {
+  color: #555;
+}
+
+.filter-group select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+}
+
+.lista-de-productos {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
 }
 
 .product-item-card {
-  display: flex; /* hace que hijos estén en fila */
-  align-items: center; /* alinea verticalmente imagen y texto */
-  gap: 10px; /* espacio entre imagen y texto */
-  padding: 8px;
-  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 4px;
   cursor: pointer;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
 }
 
 .product-item-card:hover {
-  border: 1px solid rgba(255, 182, 193, 0.7);
-  box-sizing: border-box;
+  border-color: #e57c2a66;
 }
 
-.product-item-card.selected {
-  border: 2px solid rgba(255, 182, 193, 1);
-  box-sizing: border-box;
+.product-item-card.active {
+  border-color: #e57c2a;
+  background: #fff8f3;
 }
 
 .product-item-card img {
-  width: 80px; /* tamaño fijo de la imagen */
-  height: 80px; /* mantener cuadrado */
+  width: 60px;
+  height: 60px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: #eee;
 }
 
 .item-info {
   display: flex;
-  flex-direction: column; /* el texto apilado verticalmente */
-  font-size: 0.8rem;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #555;
 }
 
-/* -------------------------------
-   DIMENSIONS
----------------------------------*/
-.Dimensions {
-  grid-area: dimensions;
-  background-color: rgba(173, 255, 47, 0.5);
-  border-radius: 8px;
-
-  display: flex;
-  flex-direction: column; /* apila header y sliders */
-  padding: 16px;
-  height: 100%; /* ocupa todo el espacio del grid */
-  box-sizing: border-box;
+.item-info h4 {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e57c2a;
 }
 
-/* Header del panel */
-.Dimensions .panel-header {
-  flex: 0 0 auto; /* ocupa solo su altura */
-  margin-bottom: 12px;
-}
-
-/* Contenedor de sliders, ocupa el resto del espacio */
+/* =============================================
+   2. DIMENSIONS
+   ============================================= */
 .dimension-sliders {
-  flex: 1 1 auto; /* crece para ocupar todo el espacio */
   display: flex;
   flex-direction: column;
-  gap: 16px; /* espacio entre grupos */
-  width: 100%; /* ocupa todo el ancho */
-  box-sizing: border-box;
-  padding: 8px;
-  border-radius: 8px;
-  overflow-y: auto; /* scroll si hay muchos sliders */
+  gap: 14px;
 }
 
-/* Cada grupo de slider + input */
 .slider-group {
   display: flex;
-  flex-direction: column; /* apilar label/select y fila de range + number */
-  gap: 6px;
-  width: 100%;
+  flex-direction: column;
+  gap: 5px;
 }
 
-/* Fila interna para range + número */
+.slider-group select {
+  font-size: 12px;
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  width: fit-content;
+}
+
 .slider-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
 }
 
-/* Slider ocupa todo el espacio disponible de la fila */
 .slider-row input[type="range"] {
   flex: 1;
-  height: 6px;
-  border-radius: 3px;
-  background: #ddd;
-  outline: none;
-}
-
-/* Thumb del slider */
-.slider-row input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+  height: 5px;
   cursor: pointer;
-  border: 2px solid #fff;
 }
 
-/* Número no se estira, fijo */
 .slider-row input[type="number"] {
-  width: 60px;
-  padding: 4px;
-  border-radius: 4px;
+  width: 54px;
+  font-size: 12px;
+  padding: 3px 5px;
   border: 1px solid #ccc;
+  border-radius: 4px;
   text-align: center;
-  flex: 0 0 auto; /* no se estira */
+  background: #fff;
+  color: #333;
+  flex-shrink: 0;
 }
 
-/* Label y select */
-.slider-group label,
-.slider-group select {
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-
-/* Radios al final */
-.dimension-sliders .unit-selector {
+.unit-selector {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  margin-top: auto; /* empuja los radios al final */
+  gap: 16px;
+  font-size: 12px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
 }
 
-/* -------------------------------
-  RESULTADOS
----------------------------------*/
-
-.Results {
-  grid-area: results;
-  background-color: rgba(255, 255, 224, 0.5);
-  border-radius: 8px;
-
+.unit-selector label {
   display: flex;
-  flex-direction: column; /* columna para apilar header + datos */
-  padding: 8px;
-  overflow-y: auto; /* scroll si hay muchos datos */
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: #333;
 }
 
+/* =============================================
+   3. RESULTS
+   ============================================= */
 .results-table {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  width: 100%;
+  gap: 5px;
 }
 
 .result-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  align-items: baseline;
+  font-size: 12px;
+  gap: 8px;
 }
 
 .result-row span {
-  color: #333;
+  color: #555;
+  font-weight: 600;
+  flex-shrink: 0;
 }
 
 .result-row strong {
-  font-weight: 600;
+  font-weight: 400;
+  color: #fafafa;
+  text-align: right;
 }
 
-/* -------------------------------
-   CANVAS
----------------------------------*/
-
-.Canvas {
-  grid-area: canvas;
-  background-color: rgba(210, 180, 140, 0.5);
-  border-radius: 8px;
+/* =============================================
+   4. CANVAS
+   ============================================= */
+.canvas-inner {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
 }
 
-.screen-canvas {
-  flex: 1;
+.human-wrap {
   display: flex;
+  align-items: flex-end;
   justify-content: center;
-  align-items: center;
+  flex-shrink: 0;
+  padding-bottom: 22px; /* align with bottom of screen + label */
 }
 
-/* grid de tiles */
+.human-wrap svg {
+  fill: #444;
+}
+
+.screen-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
 
 .screen-grid {
   display: grid;
-  gap: 4px;
-  padding: 6px;
-  border-radius: 6px;
-
-  width: 90%;
-  max-height: 90%;
+  gap: 2px;
+  background: #111;
+  padding: 3px;
+  border-radius: 3px;
 }
 
-/* cada tile */
+.screen-tile {
+  background: #1a3a2a;
+  box-shadow: inset 0 0 0 0.5px #0a2a1a;
+}
 
-.tile {
-  /* quitamos tamaño fijo */
-  width: 100%;
-  height: 100%;
+.canvas-label-h {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+}
 
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  box-shadow: 0 0 4px rgba(0, 255, 200, 0.6);
+.canvas-label-v {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #666;
+  padding: 0 4px;
+  white-space: nowrap;
+  align-self: center;
 }

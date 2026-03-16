@@ -8,7 +8,6 @@ import DimensionControls from "../components/configurator/DimensionsControls";
 import ResultsData from "../components/configurator/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
 import ScreenCanvas from "../components/configurator/ScreenCanvas";
-import imageTest from "../assets/fotoDeEjemplo.jpg";
 
 function ConfiguratorPage() {
   const { products, loading, getAll } = useProductsConfigurator();
@@ -21,26 +20,22 @@ function ConfiguratorPage() {
     location: "All",
     application: "All",
   });
-
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [tilesH, setTilesH] = useState(4);
-  const [tilesV, setTilesV] = useState(3);
-  const [unit, setUnit] = useState<Unit>("m");
+  const [tilesH, setTilesH] = useState(16);
+  const [tilesV, setTilesV] = useState(9);
+  const [unit, setUnit] = useState<Unit>("ft");
 
   const contains = (arr: string | string[] | undefined, val: string) => {
     if (val === "All" || !arr) return true;
-    if (typeof arr === "string") {
-      return arr.toLowerCase() === val.toLowerCase();
-    }
+    if (typeof arr === "string") return arr.toLowerCase() === val.toLowerCase();
     return arr.some((x) => x.toLowerCase() === val.toLowerCase());
   };
 
-  const filteredProducts = products.filter((p) => {
-    return (
+  const filteredProducts = products.filter(
+    (p) =>
       contains(p.location, filters.location) &&
-      contains(p.application, filters.application)
-    );
-  });
+      contains(p.application, filters.application),
+  );
 
   const stats: Stats | null = useMemo(() => {
     if (!selectedProduct) return null;
@@ -49,19 +44,18 @@ function ConfiguratorPage() {
 
   return (
     <>
-      <h2>Led Screen Configurator</h2>
+      <h1 className="page-title">Led Screen Configurator</h1>
 
-      <main className="container">
-        <div className="grid">
-          {/* PANEL PRODUCTOS */}
-          <aside className="config-panel left-panel glass-panel ContainerChooseAProduct">
+      <main className="configurator-container">
+        <div className="cfg-grid">
+          {/* 1. PRODUCT */}
+          <aside className="cfg-panel panel-product">
             <div className="panel-header">
-              <h2>1. Choose a Product</h2>
+              <h3>1. Choose a product</h3>
             </div>
-
-            <div className="panel-content">
+            <div className="panel-body">
               {loading ? (
-                <div className="loading">Cargando productos...</div>
+                <div className="cfg-loading">Loading products...</div>
               ) : (
                 <>
                   <ProductFilters filters={filters} setFilters={setFilters} />
@@ -75,51 +69,61 @@ function ConfiguratorPage() {
             </div>
           </aside>
 
-          {/* PANEL DIMENSIONS */}
-          <section className="Dimensions">
+          {/* 2. DIMENSIONS */}
+          <section className="cfg-panel panel-dimensions">
             <div className="panel-header">
-              <h2>2. Dimensions</h2>
+              <h3>2. Dimensions</h3>
             </div>
-            {selectedProduct && (
-              <DimensionControls
-                tilesH={tilesH}
-                tilesV={tilesV}
-                setTilesH={setTilesH}
-                setTilesV={setTilesV}
-                unit={unit}
-                setUnit={setUnit}
-              />
-            )}
+            <div className="panel-body">
+              {selectedProduct ? (
+                <DimensionControls
+                  tilesH={tilesH}
+                  tilesV={tilesV}
+                  setTilesH={setTilesH}
+                  setTilesV={setTilesV}
+                  unit={unit}
+                  setUnit={setUnit}
+                />
+              ) : (
+                <p className="cfg-placeholder">Select a product first.</p>
+              )}
+            </div>
           </section>
 
-          {/* PANEL RESULTS */}
-          <section className="Results">
+          {/* 3. RESULTS */}
+          <section className="cfg-panel panel-results">
             <div className="panel-header">
-              <h2>3. Results</h2>
+              <h3>3. Results</h3>
             </div>
-
-            {selectedProduct && stats && (
-              <ResultsData
-                product={selectedProduct}
-                stats={stats}
-                unit={unit}
-              />
-            )}
+            <div className="panel-body">
+              {selectedProduct && stats ? (
+                <ResultsData product={selectedProduct} stats={stats} />
+              ) : (
+                <p className="cfg-placeholder">No product selected.</p>
+              )}
+            </div>
           </section>
-          {/* PANEL CANVAS */}
-          <section className="Canvas">
-            <div className="panel-header">
-              <h2>4. Canvas</h2>
-            </div>
 
-            {selectedProduct && (
-              <ScreenCanvas
-                tilesH={tilesH}
-                tilesV={tilesV}
-                image={imageTest}
-                product={selectedProduct}
-              />
-            )}
+          {/* 4. CANVAS */}
+          <section className="cfg-panel panel-canvas">
+            <div className="panel-header">
+              <h3>4. Canvas</h3>
+            </div>
+            <div className="panel-body panel-body--canvas">
+              {selectedProduct && stats ? (
+                <ScreenCanvas
+                  tilesH={tilesH}
+                  tilesV={tilesV}
+                  product={selectedProduct}
+                  stats={stats}
+                  unit={unit}
+                />
+              ) : (
+                <p className="cfg-placeholder">
+                  Select a product to see preview.
+                </p>
+              )}
+            </div>
           </section>
         </div>
       </main>

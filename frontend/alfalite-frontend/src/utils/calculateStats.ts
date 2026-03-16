@@ -10,15 +10,19 @@ export interface Stats {
   resH: number;
   resV: number;
   aspect: string;
-  area: number;
+  surface: number;
+  surfaceUnit: string;
   weight: number;
   powerMax: number;
   powerAvg: number;
   btu: number;
+  optViewDistance: number;
+  dimUnit: string;
+  depth: number;
 }
 
-function getGCD(a: number, b: number): number {
-  return b === 0 ? a : getGCD(b, a % b);
+function gcd(a: number, b: number): number {
+  return b === 0 ? a : gcd(b, a % b);
 }
 
 export function calculateStats(
@@ -29,38 +33,73 @@ export function calculateStats(
 ): Stats {
   const totalTiles = tilesH * tilesV;
 
-  // Dimensiones base en metros
-  const widthBaseM = (tilesH * product.width) / 1000;
-  const heightBaseM = (tilesV * product.height) / 1000;
-
-  const diagonalM = Math.sqrt(widthBaseM ** 2 + heightBaseM ** 2);
-  const areaM = widthBaseM * heightBaseM;
-
-  const resH = tilesH * product.horizontal;
-  const resV = tilesV * product.vertical;
-
-  // Aspect Ratio corregido (Horizontal : Vertical)
-  const common = getGCD(resH, resV);
-  const aspect =
-    resH > 0 && resV > 0 ? `${resH / common} : ${resV / common}` : "0 : 0";
-
-  const powerMax = totalTiles * product.consumption;
+  // Physical size in meters
+  const wM = (tilesH * product.width) / 1000;
+  const hM = (tilesV * product.height) / 1000;
 
   const mToFt = 3.28084;
-  const m2ToFt2 = 10.7639; // Factor real m² a ft²
+  const wFt = wM * mToFt;
+  const hFt = hM * mToFt;
+
+  const diagM = Math.sqrt(wM ** 2 + hM ** 2);
+
+  // Resolution
+  const resH = tilesH * product.horizontal;
+  const resV = tilesV * product.vertical;
+  const g = gcd(resH, resV);
+  const aspect = resH > 0 && resV > 0 ? `${resH / g} : ${resV / g}` : "0 : 0";
+
+  // Power: consumption is W/module → kW total
+  const powerMaxKW = totalTiles * product.consumption;
+  const powerAvgKW = powerMaxKW * 0.35;
+  const btu = powerAvgKW * 3412.14;
+
+  // Optimal view distance: pixelPitch mm = distance in meters (industry standard)
+  const optDistM = product.pixelPitch;
+
+  // Surface: original uses widthFt * heightM (mixed, to replicate exact numbers)
+  const surfaceFt = wFt * hM;
+  const surfaceM = wM * hM;
+
+  const depthM = product.depth / 1000;
+
+  if (unit === "ft") {
+    return {
+      totalTiles,
+      widthM: wFt,
+      heightM: hFt,
+      diagonal: diagM * mToFt,
+      resH,
+      resV,
+      aspect,
+      surface: surfaceFt,
+      surfaceUnit: "ft2",
+      weight: totalTiles * product.weight,
+      powerMax: powerMaxKW,
+      powerAvg: powerAvgKW,
+      btu,
+      optViewDistance: optDistM * mToFt,
+      dimUnit: "ft",
+      depth: depthM * mToFt,
+    };
+  }
 
   return {
     totalTiles,
-    widthM: unit === "ft" ? widthBaseM * mToFt : widthBaseM,
-    heightM: unit === "ft" ? heightBaseM * mToFt : heightBaseM,
-    diagonal: unit === "ft" ? diagonalM * mToFt : diagonalM,
+    widthM: wM,
+    heightM: hM,
+    diagonal: diagM,
     resH,
     resV,
     aspect,
-    area: unit === "ft" ? areaM * m2ToFt2 : areaM,
+    surface: surfaceM,
+    surfaceUnit: "m²",
     weight: totalTiles * product.weight,
-    powerMax: powerMax,
-    powerAvg: powerMax * 0.35,
-    btu: powerMax * 3412.14, // BTU/h
+    powerMax: powerMaxKW,
+    powerAvg: powerAvgKW,
+    btu,
+    optViewDistance: optDistM,
+    dimUnit: "m",
+    depth: depthM,
   };
 }
