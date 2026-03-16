@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo } from "react";
 import "./Configurator.css";
 import { useProductsConfigurator } from "../hooks/useProducts";
 import type { Product } from "../types/product";
-import ProductList from "../components/ProductList";
-import ProductFilters from "../components/ProductFilters";
-import DimensionControls from "../components/DimensionsControls";
-import ResultsData from "../components/ResultsData";
+import ProductList from "../components/configurator/ProductList";
+import ProductFilters from "../components/configurator/ProductFilters";
+import DimensionControls from "../components/configurator/DimensionsControls";
+import ResultsData from "../components/configurator/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
-import ScreenCanvas from "../components/ScreenCanvas";
+import ScreenCanvas from "../components/configurator/ScreenCanvas";
 import imageTest from "../assets/fotoDeEjemplo.jpg";
 
 function ConfiguratorPage() {

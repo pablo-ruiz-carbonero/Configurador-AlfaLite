@@ -1,456 +1,105 @@
-// filepath: frontend/alfalite-frontend/src/pages/Dashboard.tsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
-import logo from "../assets/logo_horizontal_peq.webp";
 
 import { useProducts } from "../hooks/useProductsWithCRUD";
 import type { Product } from "../types/product";
 
-const initialProductState: Product = {
-  name: "",
-  location: [],
-  application: [],
-  horizontal: 0,
-  vertical: 0,
-  pixelPitch: 0,
-  width: 0,
-  height: 0,
-  depth: 0,
-  consumption: 0,
-  weight: 0,
-  refreshRate: 0,
-  contrast: "",
-  visionAngle: "",
-  redundancy: "",
-  curvedVersion: "",
-  opticalMultilayerInjection: "",
-  brightness: 0,
-};
+// Componentes Refactorizados
+import DashboardNav from "../components/dashboard/DashboardNav";
+import ProductCard from "../components/dashboard/ProductCard";
+import ProductFormModal from "../components/dashboard/ProductFormModal";
+import ProductDetailsModal from "../components/dashboard/ProductDetailModal"; // Crea uno similar si lo necesitas
+import ConfirmDeleteModal from "../components/dashboard/ConfirmDeleteModal";
 
 const Dashboard: React.FC = () => {
-  const { products, loading, getAll, create, update, remove } = useProducts();
-
+  const { products, getAll, create, update, remove } = useProducts();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
-
-  const [formData, setFormData] = useState<Product>(initialProductState);
-  const [isEditing, setIsEditing] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const navigate = useNavigate();
-  const token = localStorage.getItem("alfalite_token");
 
   useEffect(() => {
+    const token = localStorage.getItem("alfalite_token");
     if (!token) navigate("/admin");
     else getAll();
-  }, [token, navigate, getAll]);
+  }, [navigate, getAll]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio";
-    if (formData.pixelPitch <= 0) newErrors.pixelPitch = "Pitch inválido";
-    if (formData.brightness <= 0) newErrors.brightness = "Brillo obligatorio";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleSave = async (data: Product, isEditing: boolean) => {
+    if (isEditing && data.id) await update(data.id, data);
+    else await create(data);
+    setIsFormOpen(false);
+    getAll();
   };
 
-  const handleSaveProduct = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-    try {
-      if (isEditing && formData.id) {
-        await update(formData.id, formData);
-      } else {
-        await create(formData);
-      }
-      closeFormModal();
-      getAll();
-    } catch (err) {
-      console.error("Error al guardar:", err);
-    }
-  };
-
-  const confirmDelete = async () => {
-    if (!productToDelete) return;
-    try {
+  const handleDelete = async () => {
+    if (productToDelete) {
       await remove(productToDelete);
       setProductToDelete(null);
       getAll();
-    } catch (err) {
-      console.error("Error al borrar:", err);
     }
   };
-
-  const openCreateModal = () => {
-    setFormData(initialProductState);
-    setIsEditing(false);
-    setIsFormModalOpen(true);
-  };
-
-  const openEditModal = (product: Product, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFormData(product);
-    setIsEditing(true);
-    setIsFormModalOpen(true);
-  };
-
-  const closeFormModal = () => {
-    setIsFormModalOpen(false);
-    setErrors({});
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "number" ? (value === "" ? 0 : Number(value)) : value,
-    });
-    if (errors[name]) setErrors({ ...errors, [name]: "" });
-  };
-
-  const handleArrayChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value.split(",").map((i) => i.trim()),
-    });
-  };
-
-  const renderInput = (
-    label: string,
-    name: string,
-    placeholder: string,
-    type: string = "text",
-    step: string = "1",
-  ) => (
-    <div className={`input-group ${errors[name] ? "has-error" : ""}`}>
-      <label>{label}</label>
-      <input
-        type={type}
-        name={name}
-        step={step}
-        placeholder={placeholder}
-        value={(formData as any)[name] ?? ""}
-        onChange={handleInputChange}
-        className={errors[name] ? "input-error" : ""}
-      />
-      {errors[name] && <span className="error-text">{errors[name]}</span>}
-    </div>
-  );
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  if (loading && products.length === 0) {
-    return (
-      <div className="loading">
-        <span>Cargando catálogo...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="app-container dashboard-vertical">
-      <nav className="top-nav glass-panel">
-        <div className="logo">
-          <img src={logo} alt="Alfalite" />
-        </div>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Buscar modelo (Ej: Litepix, Modular...)"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <button className="btn-icon-new" onClick={openCreateModal}>
-          + Nuevo producto
-        </button>
-      </nav>
+      <DashboardNav
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onNewProduct={() => {
+          setProductToEdit(null);
+          setIsFormOpen(true);
+        }}
+      />
 
       <div className="cards-grid">
         {filtered.map((p) => (
-          <div
+          <ProductCard
             key={p.id}
-            className="product-card glass-panel"
+            product={p}
             onClick={() => setSelectedProduct(p)}
-          >
-            <div className="card-image">
-              <img
-                src={
-                  p.image
-                    ? `${API_BASE_URL}/${p.image}`
-                    : "https://via.placeholder.com/300x200?text=Alfalite"
-                }
-                alt={p.name}
-              />
-            </div>
-            <div className="card-info">
-              <h3>{p.name}</h3>
-            </div>
-            <div className="card-actions">
-              <button
-                className="btn-icon edit"
-                onClick={(e) => openEditModal(p, e)}
-              >
-                ✏️
-              </button>
-              <button
-                className="btn-icon delete"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  p.id && setProductToDelete(p.id);
-                }}
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
+            onEdit={(e) => {
+              e.stopPropagation();
+              setProductToEdit(p);
+              setIsFormOpen(true);
+            }}
+            onDelete={(e) => {
+              e.stopPropagation();
+              p.id && setProductToDelete(p.id);
+            }}
+          />
         ))}
       </div>
 
-      {isFormModalOpen && (
-        <div className="modal-overlay" onClick={closeFormModal}>
-          <div
-            className="modal-content glass-panel form-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button className="close-modal" onClick={closeFormModal}>
-              &times;
-            </button>
-            <h2>{isEditing ? "Editar Especificaciones" : "Nueva Pantalla"}</h2>
-            <form onSubmit={handleSaveProduct} className="product-form">
-              <div className="form-grid">
-                {renderInput("Nombre del Modelo *", "name", "Ej: Litepix P2.6")}
-                {renderInput(
-                  "Pixel Pitch (mm) *",
-                  "pixelPitch",
-                  "Ej: 2.6",
-                  "number",
-                  "0.01",
-                )}
-                {renderInput(
-                  "Brillo (nits) *",
-                  "brightness",
-                  "Ej: 1500",
-                  "number",
-                )}
-
-                <div className="input-group">
-                  <label>Localización (separar con comas)</label>
-                  <input
-                    name="location"
-                    placeholder="Ej: Indoor, Outdoor"
-                    value={formData.location.join(", ")}
-                    onChange={handleArrayChange}
-                  />
-                </div>
-                <div className="input-group">
-                  <label>Aplicación (separar con comas)</label>
-                  <input
-                    name="application"
-                    placeholder="Ej: Rental, Corporate"
-                    value={formData.application.join(", ")}
-                    onChange={handleArrayChange}
-                  />
-                </div>
-
-                {renderInput("Píxeles H", "horizontal", "Ej: 192", "number")}
-                {renderInput("Píxeles V", "vertical", "Ej: 192", "number")}
-                {renderInput(
-                  "Ancho (mm)",
-                  "width",
-                  "Ej: 500",
-                  "number",
-                  "0.01",
-                )}
-                {renderInput(
-                  "Alto (mm)",
-                  "height",
-                  "Ej: 500",
-                  "number",
-                  "0.01",
-                )}
-                {renderInput(
-                  "Profundidad (mm)",
-                  "depth",
-                  "Ej: 75",
-                  "number",
-                  "0.01",
-                )}
-                {renderInput(
-                  "Consumo (kW/h)",
-                  "consumption",
-                  "Ej: 0.18",
-                  "number",
-                  "0.01",
-                )}
-                {renderInput(
-                  "Peso (kg)",
-                  "weight",
-                  "Ej: 7.2",
-                  "number",
-                  "0.01",
-                )}
-                {/* FIX: era "refresh_rate" → correcto es "refreshRate" */}
-                {renderInput(
-                  "Tasa Refresco (Hz)",
-                  "refreshRate",
-                  "Ej: 3840",
-                  "number",
-                )}
-                {/* FIX: era "constrat" (typo) → correcto es "contrast" */}
-                {renderInput("Contraste", "contrast", "Ej: 5000:1")}
-                {renderInput("Ángulo de Visión", "visionAngle", "Ej: 160º")}
-                {renderInput("Redundancia", "redundancy", "Ej: Sí / No")}
-                {renderInput("Versión Curva", "curvedVersion", "Ej: +/- 15º")}
-                {renderInput(
-                  "Inyección Óptica",
-                  "opticalMultilayerInjection",
-                  "Ej: Sí",
-                )}
-              </div>
-              <button type="submit" className="btn-submit">
-                {isEditing ? "Guardar Cambios" : "Crear Producto"}
-              </button>
-            </form>
-          </div>
-        </div>
+      {isFormOpen && (
+        <ProductFormModal
+          initialData={productToEdit}
+          onClose={() => setIsFormOpen(false)}
+          onSave={handleSave}
+        />
       )}
 
       {productToDelete && (
-        <div className="modal-overlay" onClick={() => setProductToDelete(null)}>
-          <div
-            className="modal-content glass-panel confirm-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="danger-text">⚠️ Confirmar Borrado</h2>
-            <p>
-              ¿Seguro que quieres eliminar este producto? Esta acción es
-              irreversible.
-            </p>
-            <div className="confirm-actions">
-              <button
-                className="btn-cancel"
-                onClick={() => setProductToDelete(null)}
-              >
-                Cancelar
-              </button>
-              <button className="btn-delete-confirm" onClick={confirmDelete}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDeleteModal
+          onCancel={() => setProductToDelete(null)}
+          onConfirm={handleDelete}
+        />
       )}
 
       {selectedProduct && (
-        <div className="modal-overlay" onClick={() => setSelectedProduct(null)}>
-          <div
-            className="modal-content glass-panel"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="close-modal"
-              onClick={() => setSelectedProduct(null)}
-            >
-              &times;
-            </button>
-            <div className="modal-body">
-              <h2>{selectedProduct.name}</h2>
-              {selectedProduct.image && (
-                <div className="product-image-container">
-                  <img
-                    src={`${API_BASE_URL}/${selectedProduct.image}`}
-                    alt={selectedProduct.name}
-                    className="product-image"
-                  />
-                </div>
-              )}
-              <div className="specs-grid">
-                <div>
-                  <strong>Localización:</strong>{" "}
-                  {selectedProduct.location.join(", ")}
-                </div>
-                <div>
-                  <strong>Aplicación:</strong>{" "}
-                  {selectedProduct.application.join(", ")}
-                </div>
-                <div>
-                  <strong>Píxeles H:</strong> {selectedProduct.horizontal}
-                </div>
-                <div>
-                  <strong>Píxeles V:</strong> {selectedProduct.vertical}
-                </div>
-                <div>
-                  <strong>Pixel Pitch:</strong> {selectedProduct.pixelPitch}mm
-                </div>
-                <div>
-                  <strong>Ancho:</strong> {selectedProduct.width}mm
-                </div>
-                <div>
-                  <strong>Alto:</strong> {selectedProduct.height}mm
-                </div>
-                <div>
-                  <strong>Profundidad:</strong> {selectedProduct.depth}mm
-                </div>
-                <div>
-                  <strong>Consumo:</strong> {selectedProduct.consumption} kW/h
-                </div>
-                <div>
-                  <strong>Peso:</strong> {selectedProduct.weight}kg
-                </div>
-                <div>
-                  <strong>Brillo:</strong> {selectedProduct.brightness} nits
-                </div>
-                {selectedProduct.refreshRate && (
-                  <div>
-                    <strong>Tasa de Refresco:</strong>{" "}
-                    {selectedProduct.refreshRate}Hz
-                  </div>
-                )}
-                {selectedProduct.contrast && (
-                  <div>
-                    <strong>Contraste:</strong> {selectedProduct.contrast}
-                  </div>
-                )}
-                {selectedProduct.visionAngle && (
-                  <div>
-                    <strong>Ángulo de Visión:</strong>{" "}
-                    {selectedProduct.visionAngle}
-                  </div>
-                )}
-                {selectedProduct.redundancy && (
-                  <div>
-                    <strong>Redundancia:</strong> {selectedProduct.redundancy}
-                  </div>
-                )}
-                {selectedProduct.curvedVersion && (
-                  <div>
-                    <strong>Versión Curva:</strong>{" "}
-                    {selectedProduct.curvedVersion}
-                  </div>
-                )}
-                {selectedProduct.opticalMultilayerInjection && (
-                  <div>
-                    <strong>Inyección Óptica:</strong>{" "}
-                    {selectedProduct.opticalMultilayerInjection}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProductDetailsModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
       )}
     </div>
   );
 };
-
-// Importar la URL base para las imágenes (en lugar de hardcodear localhost)
-import { API_BASE_URL } from "../api/apiClientPublic";
 
 export default Dashboard;

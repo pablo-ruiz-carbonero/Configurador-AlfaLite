@@ -25,14 +25,11 @@ function DimensionControls({
 
   return (
     <div className="dimension-sliders">
-      {/* VERTICAL */}
+      {/* HORIZONTAL (Columnas / Width) */}
       <div className="slider-group">
         <select>
-          <option>Tiles vertical</option>
-          <option>Height</option>
-          <option>Aspect ratio</option>
+          <option>Tiles horizontal</option>
         </select>
-
         <div className="slider-row">
           <input
             type="range"
@@ -41,34 +38,24 @@ function DimensionControls({
             value={tilesH}
             onChange={(e) => setTilesH(parseInt(e.target.value))}
           />
-
           <input
             type="number"
-            min={1}
-            max={100}
             value={tilesHInput}
             onChange={(e) => {
               const val = e.target.value;
               setTilesHInput(val);
-
               const num = parseInt(val);
-              if (!isNaN(num)) {
-                setTilesH(Math.min(Math.max(num, 1), 100));
-              }
+              if (!isNaN(num)) setTilesH(Math.min(Math.max(num, 1), 100));
             }}
           />
         </div>
       </div>
 
-      {/* HORIZONTAL */}
+      {/* VERTICAL (Filas / Height) */}
       <div className="slider-group">
         <select>
-          <option>Tiles horizontal</option>
-          <option>Width</option>
-          <option>Surface</option>
-          <option>Diagonal</option>
+          <option>Tiles vertical</option>
         </select>
-
         <div className="slider-row">
           <input
             type="range"
@@ -77,46 +64,34 @@ function DimensionControls({
             value={tilesV}
             onChange={(e) => setTilesV(parseInt(e.target.value))}
           />
-
           <input
             type="number"
-            min={1}
-            max={100}
             value={tilesVInput}
             onChange={(e) => {
               const val = e.target.value;
               setTilesVInput(val);
-
               const num = parseInt(val);
-              if (!isNaN(num)) {
-                setTilesV(Math.min(Math.max(num, 1), 100));
-              }
+              if (!isNaN(num)) setTilesV(Math.min(Math.max(num, 1), 100));
             }}
           />
         </div>
       </div>
 
-      {/* UNITS */}
       <div className="unit-selector">
         <label>
           <input
             type="radio"
-            name="unit"
-            value="m"
             checked={unit === "m"}
             onChange={() => setUnit("m")}
-          />
+          />{" "}
           Meters
         </label>
-
         <label>
           <input
             type="radio"
-            name="unit"
-            value="ft"
             checked={unit === "ft"}
             onChange={() => setUnit("ft")}
-          />
+          />{" "}
           Feet
         </label>
       </div>

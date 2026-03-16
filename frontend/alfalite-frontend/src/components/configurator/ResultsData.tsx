@@ -1,6 +1,5 @@
-// filepath: src/components/ResultsData.tsx
-import type { Product } from "../hooks/useProducts";
-import type { Stats, Unit } from "../utils/calculateStats";
+import type { Product } from "../../types/product";
+import type { Stats, Unit } from "../../utils/calculateStats";
 
 interface ResultsDataProps {
   product: Product;
@@ -11,25 +10,13 @@ interface ResultsDataProps {
 function ResultsData({ product, stats, unit }: ResultsDataProps) {
   const unitLabel = unit === "m" ? "m" : "ft";
   const surfaceLabel = unit === "m" ? "m²" : "ft²";
-
-  // convertir depth de mm a unidad actual
-  const depth =
-    product.depth !== undefined
-      ? (product.depth / 1000) * (unit === "ft" ? 3.28084 : 1)
-      : 0;
-
-  // convertir aspect 1.00 -> 1 : 1
-  const aspectParts = stats.aspect.split(".");
-  const aspectFormatted =
-    aspectParts.length === 2
-      ? `${aspectParts[0]} : ${aspectParts[0]}`
-      : stats.aspect;
+  const depth = (product.depth / 1000) * (unit === "ft" ? 3.28084 : 1);
 
   return (
     <div className="results-table">
       <div className="result-row">
         <span>Product:</span>
-        <strong>*{product.name}</strong>
+        <strong>{product.name}</strong>
       </div>
 
       <div className="result-row">
@@ -56,7 +43,7 @@ function ResultsData({ product, stats, unit }: ResultsDataProps) {
 
       <div className="result-row">
         <span>Aspect ratio:</span>
-        <strong>{aspectFormatted}</strong>
+        <strong>{stats.aspect}</strong>
       </div>
 
       <div className="result-row">
@@ -84,7 +71,8 @@ function ResultsData({ product, stats, unit }: ResultsDataProps) {
       <div className="result-row">
         <span>Opt. view distance:</span>
         <strong>
-          {product.opticalMultilayerInjection ?? ">4.62"} {unitLabel}
+          {">"}
+          {product.pixelPitch} {unitLabel}
         </strong>
       </div>
 

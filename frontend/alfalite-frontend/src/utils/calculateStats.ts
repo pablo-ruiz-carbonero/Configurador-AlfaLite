@@ -1,21 +1,24 @@
-// filepath: src/utils/calculateStats.ts
-import type { Product } from "../hooks/useProducts";
+import type { Product } from "../types/product";
 
 export type Unit = "m" | "ft";
 
 export interface Stats {
   totalTiles: number;
-  widthM: number; // ancho en metros o feet según unidad
-  heightM: number; // alto en metros o feet según unidad
-  diagonal: number; // diagonal en metros o feet
-  resH: number; // resolución horizontal total
-  resV: number; // resolución vertical total
-  aspect: string; // relación de aspecto
-  area: number; // superficie total en m² o ft²
-  weight: number; // peso total en kg
-  powerMax: number; // consumo máximo en kW
-  powerAvg: number; // consumo promedio en kW
-  btu: number; // consumo en BTU
+  widthM: number;
+  heightM: number;
+  diagonal: number;
+  resH: number;
+  resV: number;
+  aspect: string;
+  area: number;
+  weight: number;
+  powerMax: number;
+  powerAvg: number;
+  btu: number;
+}
+
+function getGCD(a: number, b: number): number {
+  return b === 0 ? a : getGCD(b, a % b);
 }
 
 export function calculateStats(
@@ -26,43 +29,38 @@ export function calculateStats(
 ): Stats {
   const totalTiles = tilesH * tilesV;
 
-  // dimensiones base en metros
-  const widthM = (tilesH * product.width) / 1000;
-  const heightM = (tilesV * product.height) / 1000;
+  // Dimensiones base en metros
+  const widthBaseM = (tilesH * product.width) / 1000;
+  const heightBaseM = (tilesV * product.height) / 1000;
 
-  const diagonalM = Math.sqrt(widthM ** 2 + heightM ** 2);
-  const areaM = widthM * heightM;
+  const diagonalM = Math.sqrt(widthBaseM ** 2 + heightBaseM ** 2);
+  const areaM = widthBaseM * heightBaseM;
 
   const resH = tilesH * product.horizontal;
   const resV = tilesV * product.vertical;
 
-  const aspect = (resH / resV).toFixed(2);
+  // Aspect Ratio corregido (Horizontal : Vertical)
+  const common = getGCD(resH, resV);
+  const aspect =
+    resH > 0 && resV > 0 ? `${resH / common} : ${resV / common}` : "0 : 0";
 
-  const weight = totalTiles * product.weight;
   const powerMax = totalTiles * product.consumption;
-  const powerAvg = powerMax * 0.35;
-  const btu = powerMax * 3.412;
 
-  // conversión
   const mToFt = 3.28084;
-
-  const width = unit === "ft" ? widthM * mToFt : widthM;
-  const height = unit === "ft" ? heightM * mToFt : heightM;
-  const diagonal = unit === "ft" ? diagonalM * mToFt : diagonalM;
-  const area = unit === "ft" ? areaM * mToFt * mToFt : areaM;
+  const m2ToFt2 = 10.7639; // Factor real m² a ft²
 
   return {
     totalTiles,
-    widthM: width,
-    heightM: height,
-    diagonal,
+    widthM: unit === "ft" ? widthBaseM * mToFt : widthBaseM,
+    heightM: unit === "ft" ? heightBaseM * mToFt : heightBaseM,
+    diagonal: unit === "ft" ? diagonalM * mToFt : diagonalM,
     resH,
     resV,
     aspect,
-    area,
-    weight,
-    powerMax,
-    powerAvg,
-    btu,
+    area: unit === "ft" ? areaM * m2ToFt2 : areaM,
+    weight: totalTiles * product.weight,
+    powerMax: powerMax,
+    powerAvg: powerMax * 0.35,
+    btu: powerMax * 3412.14, // BTU/h
   };
 }
