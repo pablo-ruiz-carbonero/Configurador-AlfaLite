@@ -25,32 +25,6 @@ function DimensionControls({
 
   return (
     <div className="dimension-sliders">
-      {/* HORIZONTAL (Columnas / Width) */}
-      <div className="slider-group">
-        <select>
-          <option>Tiles horizontal</option>
-        </select>
-        <div className="slider-row">
-          <input
-            type="range"
-            min={1}
-            max={100}
-            value={tilesH}
-            onChange={(e) => setTilesH(parseInt(e.target.value))}
-          />
-          <input
-            type="number"
-            value={tilesHInput}
-            onChange={(e) => {
-              const val = e.target.value;
-              setTilesHInput(val);
-              const num = parseInt(val);
-              if (!isNaN(num)) setTilesH(Math.min(Math.max(num, 1), 100));
-            }}
-          />
-        </div>
-      </div>
-
       {/* VERTICAL (Filas / Height) */}
       <div className="slider-group">
         <select>
@@ -72,6 +46,31 @@ function DimensionControls({
               setTilesVInput(val);
               const num = parseInt(val);
               if (!isNaN(num)) setTilesV(Math.min(Math.max(num, 1), 100));
+            }}
+          />
+        </div>
+      </div>
+      {/* HORIZONTAL (Columnas / Width) */}
+      <div className="slider-group">
+        <select>
+          <option>Tiles horizontal</option>
+        </select>
+        <div className="slider-row">
+          <input
+            type="range"
+            min={1}
+            max={100}
+            value={tilesH}
+            onChange={(e) => setTilesH(parseInt(e.target.value))}
+          />
+          <input
+            type="number"
+            value={tilesHInput}
+            onChange={(e) => {
+              const val = e.target.value;
+              setTilesHInput(val);
+              const num = parseInt(val);
+              if (!isNaN(num)) setTilesH(Math.min(Math.max(num, 1), 100));
             }}
           />
         </div>

@@ -8,6 +8,8 @@ import DimensionControls from "../components/configurator/DimensionsControls";
 import ResultsData from "../components/configurator/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
 import ScreenCanvas from "../components/configurator/ScreenCanvas";
+import ModalButtons from "../components/configurator/ModalButtons";
+import type { ModalAction } from "../components/configurator/ModalButtons";
 
 function ConfiguratorPage() {
   const { products, loading, getAll } = useProductsConfigurator();
@@ -41,6 +43,27 @@ function ConfiguratorPage() {
     if (!selectedProduct) return null;
     return calculateStats(selectedProduct, tilesH, tilesV, unit);
   }, [selectedProduct, tilesH, tilesV, unit]);
+
+  const [modalAction, setModalAction] = useState<ModalAction>(null);
+
+  const handleActionClick = (action: ModalAction) => {
+    if (!selectedProduct || !stats) {
+      alert("Please select a product first to configure the screen.");
+      return;
+    }
+    setModalAction(action);
+  };
+
+  const handleFormSubmit = (formData: any) => {
+    if (modalAction === "pdf") {
+      console.log("Saving PDF...", selectedProduct, formData);
+      // Lógica de PDF aquí
+    } else if (modalAction === "quote") {
+      console.log("Requesting Quote...", selectedProduct, formData);
+      // Lógica de envío al backend aquí
+    }
+    setModalAction(null); // Cerramos el modal
+  };
 
   return (
     <>
@@ -126,6 +149,31 @@ function ConfiguratorPage() {
             </div>
           </section>
         </div>
+        <div className="main-action-section">
+          <button
+            className="btn-action"
+            onClick={() => handleActionClick("pdf")}
+          >
+            Save as PDF
+          </button>
+          <button
+            className="btn-action btn-action-primary"
+            onClick={() => handleActionClick("quote")}
+          >
+            Request a Quote
+          </button>
+        </div>
+
+        {/* --- MODAL ADAPTADO --- */}
+        {modalAction && selectedProduct && stats && (
+          <ModalButtons
+            actionType={modalAction}
+            selectedProduct={selectedProduct}
+            stats={stats}
+            onSubmit={handleFormSubmit}
+            onClose={() => setModalAction(null)}
+          />
+        )}
       </main>
     </>
   );
