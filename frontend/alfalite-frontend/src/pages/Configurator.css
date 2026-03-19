@@ -1,58 +1,140 @@
 /* =============================================
-   CONFIGURATOR – global layout
+   BASE – html / body / scrollbar
    ============================================= */
-
-.page-title {
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 400;
-  margin: 16px 0 12px;
+html, body {
+  height: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  scrollbar-color: var(--primary) rgba(15, 26, 41, 0.65);
+  scrollbar-width: thin;
 }
 
+::-webkit-scrollbar       { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(15, 26, 41, 0.65); border-radius: 999px; }
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 999px;
+  border: 2px solid rgba(14, 27, 46, 0.3);
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.9); }
+
+
+/* =============================================
+   LAYOUT – contenedor principal
+   ============================================= */
 .configurator-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   padding: 0 16px 32px;
+  min-height: 100vh;
   box-sizing: border-box;
-  flex-direction: column;
 }
 
-/* 3-col top row, canvas spans cols 2-3 on bottom */
+/* Grid de 3 columnas:
+   col 1 → producto (fijo 280px)
+   cols 2-3 → dimensiones / resultados arriba, canvas abajo
+   El canvas no tiene altura fija: ocupa todo el espacio restante. */
 .cfg-grid {
   display: grid;
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
   grid-template-columns: 280px 1fr 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr;   /* ← 1fr: canvas crece hasta llenar */
   grid-template-areas:
     "product dimensions results"
     "product canvas    canvas";
   gap: 12px;
-  min-height: 620px;
+  min-height: 700px;
+  max-height: calc(100vh - 100px); /* más alto al quitar la barra de copy */
+  overflow: auto;
+  padding-bottom: 20px;
 }
 
+
 /* =============================================
-   PANELS – shared
+   CABECERA – solo título, sin barra de copy
    ============================================= */
-.cfg-panel {
-  border: 1.5px solid var(--primary);
-  border-radius: 6px;
+.title-row {
   display: flex;
   flex-direction: column;
-  background: var(--border-glass);
+  align-items: center;
+  max-width: 1200px;
+  margin: 16px auto 8px;
+  padding: 0 16px;
+  gap: 8px;
+}
+
+.page-title {
+  text-align: center;
+  font-size: clamp(1.8rem, 2.2vw, 2.6rem);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 750px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.95), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* La barra .copy-action-wrap ya no se usa como sección independiente.
+   Se mantiene por si se renderiza, pero queda oculta. */
+.copy-action-wrap { display: flex; align-items: center; gap: 8px; position: relative; }
+
+/* Feedback "copiado" — sigue siendo absoluto dentro del panel-results */
+.copy-feedback {
+  position: absolute;
+  bottom: -22px;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: all 0.25s ease-out;
+}
+.copy-feedback.copied  { color: #70d670; opacity: 1; transform: translateY(-6px); }
+.copy-feedback.failed  { color: #f46f6f; opacity: 1; transform: translateY(-6px); }
+
+
+/* =============================================
+   PANELES – base compartida
+   ============================================= */
+.cfg-panel {
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
+  animation: fadeInUp 0.35s ease-out both;
 }
 
 .panel-header {
   padding: 8px 12px 6px;
-  border-bottom: 1px solid var(--primary);
+  border-bottom: 1px solid var(--border-primary);
+  /* Flex para poder meter el botón copy a la derecha */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .panel-header h3 {
+  margin: 0;
   font-size: 13px;
   font-weight: 600;
   color: var(--text-main);
-  margin: 0;
+  flex-shrink: 0;
 }
 
 .panel-body {
@@ -64,51 +146,51 @@
   min-height: 0;
 }
 
-.panel-product .panel-body {
-  overflow: hidden;
-  height: 100%;
-}
-
 .panel-body--canvas {
   padding: 8px;
   align-items: center;
   justify-content: center;
 }
 
-.cfg-placeholder {
-  color: var(--text-main);
-  font-size: 13px;
-  text-align: center;
-  margin: auto;
-}
-
-.cfg-loading {
-  color: var(--text-main);
-  font-size: 13px;
-  padding: 12px 0;
-}
-
-/* =============================================
-   PANEL AREAS
-   ============================================= */
-.panel-product {
-  grid-area: product;
-  max-height: 620px;
-  overflow: hidden;
-}
-.panel-dimensions {
-  grid-area: dimensions;
-}
-.panel-results {
+/* Áreas del grid */
+.panel-product    { grid-area: product;  max-height: 700px; overflow: hidden; }
+.panel-dimensions { grid-area: dimensions; }
+.panel-results    {
   grid-area: results;
   overflow-y: auto;
+  /* Posición relativa para el .copy-feedback */
+  position: relative;
 }
-.panel-canvas {
+/* Canvas ocupa todo el espacio restante de su celda */
+.panel-canvas     {
   grid-area: canvas;
+  min-height: 0;   /* permite que el panel se encoja si hace falta */
 }
 
+.cfg-placeholder { color: var(--text-dim); font-size: 13px; text-align: center; margin: auto; }
+.cfg-loading     { color: var(--text-dim); font-size: 13px; padding: 12px 0; }
+
+
 /* =============================================
-   1. PRODUCT LIST
+   BOTÓN COPY – dentro del header de Results
+   ============================================= */
+.btn-copy {
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
+  background: transparent;
+  color: var(--text-dim);
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition), color var(--transition);
+}
+.btn-copy:hover { background: var(--primary); color: #000; }
+
+
+/* =============================================
+   1. PANEL PRODUCTO – lista y filtros
    ============================================= */
 .filter-group {
   display: flex;
@@ -117,9 +199,6 @@
   margin-bottom: 10px;
   flex-shrink: 0;
   font-size: 12px;
-}
-
-.filter-group label {
   color: var(--text-main);
 }
 
@@ -128,15 +207,11 @@
   font-size: 12px;
   padding: 4px 6px;
   border: 1px solid var(--primary);
-  border-radius: 4px;
-  background: var(--border-glass);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
   color: var(--text-main);
 }
-
-.filter-group select option {
-  background: #fff;
-  color: #333;
-}
+.filter-group select option { background: #1a1a1a; color: #fff; }
 
 .lista-de-productos {
   flex: 1;
@@ -152,95 +227,57 @@
   align-items: center;
   gap: 10px;
   padding: 6px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
   cursor: pointer;
-  border: 1.5px solid transparent;
-  transition: border-color 0.15s;
   flex-shrink: 0;
+  transition: border-color var(--transition), background var(--transition);
 }
-
-.product-item-card:hover {
-  border-color: var(--primary-hover);
-}
-
+.product-item-card:hover  { border-color: var(--primary-hover); }
 .product-item-card.active {
-  border-color: var(--primary-hover);
-  background: var(--border-glass);
+  border-color: var(--primary);
+  background: rgba(255, 115, 3, 0.08);
 }
 
 .product-item-card img {
   width: 60px;
   height: 60px;
   object-fit: cover;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
 }
 
-.item-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 11px;
-  color: var(--text-main);
-}
+.item-info { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-dim); }
+.item-info h4 { margin: 0 0 2px; font-size: 12px; font-weight: 600; color: var(--primary); }
 
-.item-info h4 {
-  margin: 0 0 2px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary-hover);
-}
 
 /* =============================================
-   2. DIMENSIONS
+   2. PANEL DIMENSIONES – sliders
    ============================================= */
-.dimension-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+.dimension-sliders { display: flex; flex-direction: column; gap: 14px; }
+.slider-group { display: flex; flex-direction: column; gap: 5px; }
 
 .slider-group select {
   font-size: 12px;
   padding: 3px 6px;
   border: 1px solid var(--primary);
-  border-radius: 4px;
-  background: var(--border-glass);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
   color: var(--text-main);
   width: fit-content;
 }
+.slider-group select option { background: #1a1a1a; color: #fff; }
 
-.slider-group select option {
-  background: #fff;
-  color: #333;
-}
-
-.slider-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.slider-row input[type="range"] {
-  flex: 1;
-  height: 5px;
-  cursor: pointer;
-}
-
+.slider-row { display: flex; align-items: center; gap: 8px; }
+.slider-row input[type="range"]  { flex: 1; height: 5px; cursor: pointer; accent-color: var(--primary); }
 .slider-row input[type="number"] {
   width: 54px;
   font-size: 12px;
   padding: 3px 5px;
   border: 1px solid var(--primary);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   text-align: center;
-  background: var(--border-glass);
+  background: var(--bg-input);
   color: var(--text-main);
   flex-shrink: 0;
 }
@@ -252,25 +289,16 @@
   font-size: 12px;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--primary);
-}
-
-.unit-selector label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
+  border-top: 1px solid var(--border-glass);
   color: var(--text-main);
 }
+.unit-selector label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
 
 /* =============================================
-   3. RESULTS
+   3. PANEL RESULTADOS – tabla de stats
    ============================================= */
-.results-table {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+.results-table { display: flex; flex-direction: column; gap: 5px; }
 
 .result-row {
   display: flex;
@@ -278,22 +306,18 @@
   align-items: baseline;
   font-size: 12px;
   gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border-glass);
+  animation: fadeInUp 0.3s ease-out both;
+  animation-delay: calc(var(--i, 0) * 40ms); /* añade style="--i:N" en cada fila */
 }
+.result-row:last-child { border-bottom: none; }
+.result-row span   { color: var(--text-dim); font-weight: 500; flex-shrink: 0; }
+.result-row strong { color: var(--primary);  font-weight: 600; text-align: right; }
 
-.result-row span {
-  color: var(--text-main);
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.result-row strong {
-  font-weight: 400;
-  color: var(--primary);
-  text-align: right;
-}
 
 /* =============================================
-   4. CANVAS
+   4. PANEL CANVAS – previsualización
    ============================================= */
 .canvas-inner {
   display: flex;
@@ -310,25 +334,17 @@
   align-items: flex-end;
   justify-content: center;
   flex-shrink: 0;
-  padding-bottom: 22px; /* align with bottom of screen + label */
+  padding-bottom: 22px;
 }
+.human-wrap svg { fill: #444; }
 
-.human-wrap svg {
-  fill: #444;
-}
-
-.screen-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
+.screen-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 
 .screen-grid {
   display: grid;
   gap: 2px;
   padding: 3px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .screen-tile {
@@ -336,55 +352,40 @@
   box-shadow: inset 0 0 0 0.5px #0a2a1a;
 }
 
-.canvas-label-h {
-  font-size: 11px;
-  color: var(--text-main);
-  text-align: center;
-}
-
+.canvas-label-h { font-size: 11px; color: var(--text-dim); text-align: center; }
 .canvas-label-v {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
   gap: 4px;
   font-size: 11px;
-  color: var(--text-main);
+  color: var(--text-dim);
   padding: 0 4px;
   white-space: nowrap;
   align-self: center;
 }
 
-/* =============================================
-   5. Seccion de botones
-   ============================================= */
 
-.btn-section {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 20px;
-}
+/* =============================================
+   5. BOTONES DE SECCIÓN
+   ============================================= */
+.btn-section { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+
 .btn-section button {
   padding: 8px 16px;
   font-size: 12px;
-  border: 1.5px solid var(--primary);
-  border-radius: 4px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
   background: var(--border-glass);
   color: var(--text-main);
   cursor: pointer;
-  transition:
-    background-color 0.15s,
-    border-color 0.15s;
+  transition: background var(--transition), color var(--transition);
 }
-.btn-section button:hover {
-  background: var(--primary);
-  border-color: var(--primary-hover);
-  color: #fff;
-}
+.btn-section button:hover { background: var(--primary); color: #000; }
+
 
 /* =============================================
-   6. BOTONES PRINCIPALES Y ACCIONES
+   6. BOTONES DE ACCIÓN PRINCIPALES
    ============================================= */
 .main-action-section {
   display: flex;
@@ -393,10 +394,10 @@
   margin-top: 30px;
   width: 100%;
   max-width: 1200px;
-  animation: fadeInUp 0.6s ease-out;
+  padding: 10px 0;
+  animation: fadeInUp 0.5s ease-out both;
 }
 
-/* Estilo Base de Botones */
 .btn-action {
   position: relative;
   padding: 14px 28px;
@@ -404,69 +405,72 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  overflow: hidden;
+  border-radius: var(--radius-md);
   border: 2px solid var(--primary);
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 10px;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
-/* Botón PDF (Secundario/Glass) */
+/* Secundario (glass) */
 .btn-action:not(.btn-action-primary) {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
-  backdrop-filter: blur(5px);
 }
-
 .btn-action:not(.btn-action-primary):hover {
   background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.05);
 }
 
-/* Botón Quote (Primario/Glowing) */
+/* Primario (naranja) */
 .btn-action-primary {
   background: var(--primary);
-  color: #000; /* Texto oscuro para contraste si primary es brillante */
-  box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+  color: #000;
+  box-shadow: 0 4px 15px var(--primary-glow);
 }
-
 .btn-action-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.5);
+  box-shadow: 0 8px 28px var(--primary-glow);
   filter: brightness(1.1);
 }
+.btn-action:active { transform: translateY(0); }
 
-.btn-action:active {
-  transform: translateY(0);
+/* Shimmer en hover sobre botón primario */
+.btn-action-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.45s ease;
 }
+.btn-action-primary:hover::after { transform: translateX(100%); }
+
 
 /* =============================================
-   7. MODAL MODERNO (ANIMADO)
+   7. MODAL
    ============================================= */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 .modal {
   background: linear-gradient(145deg, #1e1e1e, #121212);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-left: 4px solid var(--primary); /* Acento moderno lateral */
-  border-radius: 12px;
+  border: 1px solid var(--border-glass);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-lg);
   padding: 40px;
   width: 90%;
   max-width: 600px;
@@ -474,17 +478,11 @@
   overflow-y: auto;
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-  animation: modalScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Personalización del Scrollbar del Modal */
-.modal::-webkit-scrollbar {
-  width: 6px;
-}
-.modal::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 10px;
-}
+.modal::-webkit-scrollbar       { width: 6px; }
+.modal::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
 
 .modal h2 {
   font-size: 24px;
@@ -494,139 +492,102 @@
   -webkit-text-fill-color: transparent;
 }
 
-.modal-subtitle {
-  color: #888;
-  font-size: 14px;
-  margin-bottom: 30px;
-}
+.modal-subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
 
-/* Distribución del Formulario en Grid */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 25px;
-}
-
-@media (max-width: 500px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+@media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
 
 .modal-form label {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  color: #bbb;
+  color: rgba(255,255,255,0.7);
   font-size: 12px;
   font-weight: 600;
-  transition: color 0.3s;
 }
 
 .modal-form input,
 .modal-form select {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
   padding: 12px;
   color: #fff;
   font-size: 14px;
-  transition: all 0.3s;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
 }
-
 .modal-form input:focus,
 .modal-form select:focus {
   outline: none;
   border-color: var(--primary);
-  background: rgba(var(--primary-rgb), 0.05);
-  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.1);
+  background: rgba(255, 115, 3, 0.05);
+  box-shadow: 0 0 10px var(--primary-glow);
 }
 
-/* Botones dentro del Modal */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
   margin-top: 30px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-glass);
 }
 
 .btn-cancel {
   background: transparent;
   border: none;
-  color: #666;
+  color: var(--text-muted);
   cursor: pointer;
   font-weight: 600;
-  transition: color 0.3s;
+  transition: color var(--transition);
 }
-
-.btn-cancel:hover {
-  color: #fff;
-}
+.btn-cancel:hover { color: #fff; }
 
 .btn-confirm {
   background: var(--primary);
   color: #000;
   padding: 12px 25px;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   border: none;
   font-weight: 700;
   cursor: pointer;
+  transition: filter var(--transition), transform var(--transition);
 }
+.btn-confirm:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-/* Cerrar (X) */
 .close-btn {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.05);
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  transition: all 0.3s;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
 }
+.close-btn:hover { background: rgba(230, 50, 50, 0.2); color: #ff4d4d; }
 
-.close-btn:hover {
-  background: rgba(230, 50, 50, 0.2);
-  color: #ff4d4d;
-}
 
 /* =============================================
-   ANIMACIONES (Keyframes)
+   ANIMACIONES
    ============================================= */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes modalScaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.93) translateY(16px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);    }
 }

@@ -1,11 +1,30 @@
+/* =============================================
+   TOKENS – variables globales
+   Modifica aquí para cambiar toda la UI de golpe.
+   ============================================= */
+
 :root {
-  --primary: #ff7303;
-  --primary-hover: #e66700;
-  --primary-glow: rgba(255, 115, 3, 0.25);
-  --bg-dark: #050505;
-  --text-main: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.6);
-  --border-glass: rgba(255, 255, 255, 0.1);
+  --primary:        #ff7303;
+  --primary-hover:  #e66700;
+  --primary-glow:   rgba(255, 115, 3, 0.25);
+  --primary-rgb:    255, 115, 3;
+
+  --bg-dark:        #050505;
+  --bg-panel:       rgba(255, 255, 255, 0.03);
+  --bg-input:       rgba(255, 255, 255, 0.05);
+
+  --text-main:      #ffffff;
+  --text-dim:       rgba(255, 255, 255, 0.6);
+  --text-muted:     rgba(255, 255, 255, 0.35);
+
+  --border-glass:   rgba(255, 255, 255, 0.08);
+  --border-primary: var(--primary);
+
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  12px;
+
+  --transition: 0.2s ease;
 }
 
 * {

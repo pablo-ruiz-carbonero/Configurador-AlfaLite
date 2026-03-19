@@ -45,6 +45,7 @@ function ConfiguratorPage() {
   }, [selectedProduct, tilesH, tilesV, unit]);
 
   const [modalAction, setModalAction] = useState<ModalAction>(null);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   const handleActionClick = (action: ModalAction) => {
     if (!selectedProduct || !stats) {
@@ -65,9 +66,44 @@ function ConfiguratorPage() {
     setModalAction(null); // Cerramos el modal
   };
 
+  const copyResultsToClipboard = () => {
+    if (!selectedProduct || !stats) {
+      alert("Select a product and configure dimensions to copy results.");
+      return;
+    }
+
+    const lines = [
+      `Product: ${selectedProduct.name}`,
+      `Resolution: ${stats.resH} x ${stats.resV} px`,
+      `Dimensions: ${stats.widthM.toFixed(2)} x ${stats.heightM.toFixed(2)} x ${stats.depth.toFixed(2)} ${stats.dimUnit}`,
+      `Diagonal: ${stats.diagonal.toFixed(2)} ${stats.dimUnit}`,
+      `Aspect ratio: ${stats.aspect}`,
+      `Surface: ${stats.surface.toFixed(2)} ${stats.surfaceUnit}`,
+      `Max. power consumption: ${stats.powerMax.toFixed(2)} kW`,
+      `Avg. power consumption: ${stats.powerAvg.toFixed(2)} kW`,
+      `Weight: ${stats.weight.toFixed(2)} kg`,
+      `Opt. view distance: >${stats.optViewDistance.toFixed(2)} ${stats.dimUnit}`,
+      `Brightness: ${selectedProduct.brightness ?? 0} cd/m2`,
+      `Total tiles: ${stats.totalTiles}`,
+    ];
+
+    navigator.clipboard
+      .writeText(lines.join("\n"))
+      .then(() => {
+        setCopyStatus("copied");
+        setTimeout(() => setCopyStatus("idle"), 1800);
+      })
+      .catch(() => {
+        setCopyStatus("failed");
+        setTimeout(() => setCopyStatus("idle"), 1800);
+      });
+  };
+
   return (
     <>
-      <h1 className="page-title">Led Screen Configurator</h1>
+      <div className="title-row">
+        <h1 className="page-title">Led Screen Configurator</h1>
+      </div>
 
       <main className="configurator-container">
         <div className="cfg-grid">
@@ -106,6 +142,7 @@ function ConfiguratorPage() {
                   setTilesV={setTilesV}
                   unit={unit}
                   setUnit={setUnit}
+                  product={selectedProduct}
                 />
               ) : (
                 <p className="cfg-placeholder">Select a product first.</p>
@@ -115,8 +152,21 @@ function ConfiguratorPage() {
 
           {/* 3. RESULTS */}
           <section className="cfg-panel panel-results">
-            <div className="panel-header">
+            <div className="panel-header results-header-wrap">
               <h3>3. Results</h3>
+              <div className="copy-action-wrap">
+                <button
+                  type="button"
+                  className="btn-copy"
+                  onClick={copyResultsToClipboard}
+                >
+                  Copy in clipboard
+                </button>
+                <span className={`copy-feedback ${copyStatus}`}>
+                  {copyStatus === "copied" && "Copied!"}
+                  {copyStatus === "failed" && "Copy failed"}
+                </span>
+              </div>
             </div>
             <div className="panel-body">
               {selectedProduct && stats ? (
