@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { Product } from "../../types/product";
 
 interface ProductListProps {
@@ -13,12 +14,9 @@ function ProductList({
   selectedProduct,
   onSelectProduct,
 }: ProductListProps) {
+  const { t } = useTranslation();
   if (products.length === 0) {
-    return (
-      <div className="cfg-placeholder">
-        No products found for those filters.
-      </div>
-    );
+    return <div className="cfg-placeholder">{t("NotFoundProductFilter")}</div>;
   }
 
   return (

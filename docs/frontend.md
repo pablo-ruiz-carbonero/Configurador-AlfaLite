@@ -1,34 +1,45 @@
-# Frontend – alfalite-frontend
+# Frontend - alfalite-frontend
 
-El frontend es una single-page application desarrollada con React y Vite. Permite a los usuarios iniciar sesión, ver y gestionar productos en un panel de control.
+Single-Page Application (SPA) desarrollada con React 18, Vite y TypeScript. Proporciona interfaz de usuario para autenticación, configuración de pantallas LED y panel administrativo.
 
-## 📁 Estructura relevante
+## Estructura del Proyecto
 
 ```
 frontend/alfalite-frontend/
-  public/                      ← activos estáticos (imágenes, favicon, etc.)
+  public/                      Activos estáticos (imágenes, favicon, etc.)
   src/
-    assets/                    ← recursos (logos, imágenes, etc.)
-    components/                ← componentes reutilizables
-    pages/                     ← páginas principales (Auth, Dashboard)
-    App.tsx                    ← configuración de rutas y PrivateRoute
-    main.tsx                   ← punto de entrada
-  package.json
-  tsconfig.json
-  vite.config.ts
+    assets/                    Recursos de medios (logos, imágenes)
+    components/                Componentes reutilizables organizados por funcionalidad
+      configurator/            Componentes del configurador de pantallas LED
+      dashboard/               Componentes del panel administrativo
+    hooks/                     Hooks personalizados para lógica de estado
+    pages/                     Páginas principales (Auth, Configurator, Dashboard)
+    api/                       Funciones de comunicación con API
+    types/                     Definiciones de tipos TypeScript
+    utils/                     Funciones auxiliares reutilizables
+    App.tsx                    Enrutamiento y configuración de rutas protegidas
+    main.tsx                   Punto de entrada de la aplicación
+  package.json                 Dependencias del proyecto
+  tsconfig.json                Configuración de TypeScript
+  vite.config.ts               Configuración de Vite
 ```
 
-## ⚙ Variables de entorno
+## Configuración del Entorno
 
-- `VITE_API_URL` – URL base de la API (por ejemplo `http://localhost:1337`).
-  Vite sólo lee variables con prefijo `VITE_`.
+El proyecto utiliza variables de entorno con prefijo `VITE_` que Vite expone automáticamente en `import.meta.env`:
 
-Crea un fichero `.env` en la raíz del proyecto con dicha variable.
+- `VITE_API_URL` - URL base de la API (ejemplo: `http://localhost:1337`)
 
-## 📦 Scripts disponibles
+Cree un archivo `.env` en la raíz del proyecto:
+
+```
+VITE_API_URL=http://localhost:1337
+```
+
+## Scripts Disponibles
 
 ```json
-"scripts": {
+{
   "dev": "vite",
   "build": "tsc -b && vite build",
   "lint": "eslint .",
@@ -36,43 +47,176 @@ Crea un fichero `.env` en la raíz del proyecto con dicha variable.
 }
 ```
 
-- `npm run dev` – servidor de desarrollo en `localhost:5173`.
-- `npm run build` – genera el paquete de producción en `dist`.
-- `npm run lint` – ejecuta ESLint con reglas de TypeScript y React.
+- `npm run dev` - Inicia servidor de desarrollo en `http://localhost:5173`
+- `npm run build` - Compila TypeScript y genera versión de producción en carpeta `dist`
+- `npm run lint` - Ejecuta ESLint para verificar código
+- `npm run preview` - Previsualiza versión compilada antes de desplegar
 
-## 📝 Componentes clave
+## Componentes Principales
 
-- **Auth.tsx** – formulario de login/registro. Envía credenciales al endpoint `/auth/login` y guarda el JWT en `localStorage`.
-- **Dashboard.tsx** – pantalla principal; lista productos, permite crear, editar, borrar y buscar. La URL de la API se lee de `import.meta.env.VITE_API_URL`.
-- **PrivateRoute** (en `App.tsx`) – comprueba la existencia del token JWT y redirige al login en caso contrario.
+### Páginas
 
-## 🛠 Mejoras aplicadas y sugeridas
+**Auth.tsx** - Autenticación
 
-- Corregido el typo `constrat` a `contrast` en el tipo `Product` para concordar con el backend.
-- Añadidos comentarios y validaciones básicas de formulario con mensajes.
-- Se creó `src/services/apiClient.ts` que centraliza todas las llamadas `fetch` y maneja tokens/errores.
-- Se introdujo el hook `useProducts` (`src/hooks/useProducts.ts`) para separar la lógica de peticiones y estado de los componentes.
-  - ahora internamente utiliza un hook genérico `useApi` (`src/hooks/useApi.ts`) que abstrae la carga inicial,
-    el estado `loading`/`error` y la recarga (`refetch`). Esto evita duplicar código cuando se añadan
-    otros endpoints y resuelve el bug del «bucle infinito» de carga porque la petición se dispara
-    **una sola vez** al montar el hook.
-- El cliente HTTP (`apiClient`) está tipado para devolver directamente `T` en vez de
-  `AxiosResponse<T>`, por lo que no es necesario acceder a `.data` en cada llamada.
-- Todos los `fetch` comprueban `response.ok` y redirigen en caso de 401.
+- Proporciona formulario de login y registro
+- Envia credenciales al endpoint `/auth/login`
+- Almacena JWT en localStorage para sesiones posteriores
+- Redirige a dashboard si el usuario ya está autenticado
 
-### Ideas de ampliación
+**ConfiguratorPage.tsx** - Configurador interactivo
 
-- Usar `React Query` o `axios` para manejar solicitudes y caché.
-- Extraer lógica de datos a hooks (`useProducts`, `useAuth`).
-- Añadir pruebas con Jest y React Testing Library.
-- Implementar manejo de errores global y notificaciones.
+- Permite a usuarios adicionar productos LED virtuales
+- Controles para dimensiones (alto/ancho en pies o metros)
+- Generación de PDF con especificaciones
+- Envío de solicitud de cotización por email
+- Cálculo automático de estadísticas (resolución, consumo, peso)
+
+**Dashboard.tsx** - Panel administrativo protegido
+
+- Listado de todos los productos con búsqueda
+- Crear nuevos productos
+- Editar especificaciones existentes
+- Eliminar productos
+- Cargar imágenes de productos
+
+### Componentes Reutilizables
+
+**configurator/**
+
+- `ProductList.tsx` - Listado de productos disponibles con filtros
+- `ProductFilters.tsx` - Controles para filtrar productos por especificaciones
+- `DimensionsControls.tsx` - Entrada de dimensiones en diferentes unidades
+- `ScreenCanvas.tsx` - Visualización interactiva de pantalla configurada
+- `ResultsData.tsx` - Mostrar estadísticas calculadas
+- `ModalButtons.tsx` - Botones de acción (Generar PDF, Solicitar cotización)
+
+**dashboard/**
+
+- `ProductCard.tsx` - Tarjeta individual con información de producto
+- `ProductFormModal.tsx` - Formulario modal para crear/editar productos
+- `ProductDetailModal.tsx` - Vista detallada de especificaciones de producto
+- `ConfirmDeleteModal.tsx` - Confirmación de eliminación de producto
+- `DashboardNav.tsx` - Navegación del panel administrativo
+
+## Hooks Personalizados
+
+### useProducts
+
+Gestiona estado de productos del configurador (públicos):
+
+```typescript
+const {
+  products, // Array de productos disponibles
+  loading, // Indicador de carga
+  error, // Mensaje de error si existe
+  refetch, // Función para recargar datos
+} = useProducts();
+```
+
+### useProductsWithCRUD
+
+Gestiona estado de productos administrativos con operaciones CRUD:
+
+```typescript
+const {
+  products, // Array de productos
+  loading, // Indicador de carga
+  selectedProduct, // Producto actualmente seleccionado
+  formData, // Datos del formulario
+  error, // Mensaje de error
+  setSelectedProduct, // Actualizar producto seleccionado
+  setFormData, // Actualizar campos del formulario
+  refetch, // Recargar desde servidor
+  handleCreate, // Crear nuevo producto
+  handleUpdate, // Actualizar producto existente
+  handleDelete, // Eliminar producto
+} = useProductsWithCRUD();
+```
+
+## Comunicación con API
+
+Archivo `src/api/apiClient.ts` centraliza todas las llamadas HTTP:
+
+- Gestiona tokens JWT automáticamente en headers
+- Maneja redirección en caso de 401 Unauthorized
+- Proporciona métodos tipados para cada endpoint
+
+Archivo `src/api/products.ts` define funciones específicas de dominio:
+
+- `getPublicProducts()` - Obtener productos disponibles (público)
+- `getProductById(id)` - Obtener detalles de un producto (público)
+- `sendQuoteRequest(data)` - Enviar cotización por email
+- `generatePdf(data)` - Generar PDF de configuración
+- `getDashboardProducts()` - Obtener todos los productos (admin)
+- `createProduct(data)` - Crear nuevo producto
+- `updateProduct(id, data)` - Actualizar producto existente
+- `deleteProduct(id)` - Eliminar producto
+
+## Autenticación y Rutas Protegidas
+
+El componente `PrivateRoute` en `App.tsx`:
+
+- Verifica existencia de JWT en localStorage
+- Redirige a página de login si no hay token válido
+- Permite acceso a rutas administrativas solo con credenciales válidas
+- Valida token al montar componentes protegidos
+
+## Estilos
+
+- Estilos globales en `src/index.css`
+- Estilos específicos de página en archivos `.css` correspondientes
+- Estilos de componentes usando CSS modules o inline
+
+## Manejo de Imágenes
+
+Las imágenes de productos se almacenan en el backend:
+
+- Ruta de acceso: `{API_URL}/uploads/images/{nombreArchivo}`
+- Se cargan dinámicamente en componentes ProductCard
+- Soporte para formatos: JPEG, PNG, WebP, AVIF
+
+## Despliegue en Producción
+
+1. Compile la aplicación:
+
+```bash
+npm run build
+```
+
+2. Sirva la carpeta `dist` con un servidor web estático:
+
+```bash
+# Usando Node.js con http-server
+npx http-server dist
+
+# O con Python
+python -m http.server 3000 --directory dist
+
+# O con nginx/Apache (ver README.md para configuración)
+```
+
+3. Configure la variable `VITE_API_URL` apuntando a su API en producción
+
+## Mejoras Futuras
+
+1. Implementar React Query o SWR para caché automático de datos
+2. Agregar paginación a listados de productos
+3. Implementar búsqueda avanzada con filtros múltiples
+4. Agregar validación de formularios más robusta con bibliotecas como React Hook Form
+5. Implementar notificaciones globales (toasts) para acciones
+6. Agregar pruebas automatizadas con Jest y React Testing Library
+7. Implementar gestión de estado con Context API o Redux para aplicaciones más grandes
+8. Agregar soporte para múltiples idiomas (i18n)
+9. Mejorar accesibilidad (WCAG 2.1) con ARIA labels y navegación por teclado
+10. Implementar PWA (Progressive Web App) para funcionalidad offline
+
+## Tecnologías Utilizadas
+
+- **React 18**: Biblioteca UI con hooks y functional components
+- **Vite**: Build tool y dev server ultra-rápido
+- **TypeScript**: Lenguaje tipado para mayor seguridad
+- **axios**: Cliente HTTP para comunicación con backend
+- **ESLint**: Validación de código y best practices
+- **Tailwind CSS / CSS Modules**: Estilos (según configuración del proyecto)
 
 ---
-
-**Estilos**
-
-Los estilos globales están en `src/index.css`; cada página tiene su propio archivo `.css`.
-
-**Assets**
-
-Las imágenes subidas al backend se exponen vía `uploads/` y se cargan utilizando la ruta completa (`${API_URL}/uploads/...`).

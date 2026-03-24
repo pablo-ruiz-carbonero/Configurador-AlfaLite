@@ -6,30 +6,34 @@ interface Props {
   setFilters: (filters: any) => void;
 }
 
+import { useTranslation } from "react-i18next";
+
 function ProductFilters({ filters, setFilters }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="filter-group">
-      <label>Locatation: </label>
+      <label>{t("location")}:</label>
       <select
         value={filters.location}
         onChange={(e) => setFilters({ ...filters, location: e.target.value })}
       >
-        <option value="All">All</option>
-        <option value="Indoor">Indoor</option>
-        <option value="Outdoor">Outdoor</option>
+        <option value="All">{t("all")}</option>
+        <option value="Indoor">{t("indoor")}</option>
+        <option value="Outdoor">{t("outdoor")}</option>
       </select>
 
-      <label>Application</label>
+      <label>{t("application")}:</label>
       <select
         value={filters.application}
         onChange={(e) =>
           setFilters({ ...filters, application: e.target.value })
         }
       >
-        <option value="All">All</option>
-        <option value="Rental">Rental</option>
-        <option value="Fixed">Fixed Install</option>
-        <option value="Broadcast">Broadcast</option>
+        <option value="All">{t("all")}</option>
+        <option value="Rental">{t("rental")}</option>
+        <option value="Fixed">{t("fixed")}</option>
+        <option value="Broadcast">{t("broadcast")}</option>
       </select>
     </div>
   );

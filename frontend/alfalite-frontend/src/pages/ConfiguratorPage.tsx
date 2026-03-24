@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useToast } from "../hooks/useToast";
 import "./Configurator.css";
 import { useProductsConfigurator } from "../hooks/useProducts";
 import type { Product } from "../types/product";
@@ -10,9 +12,17 @@ import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
 import ScreenCanvas from "../components/configurator/ScreenCanvas";
 import ModalButtons from "../components/configurator/ModalButtons";
 import type { ModalAction } from "../components/configurator/ModalButtons";
+import {
+  sendQuoteRequest,
+  type QuoteData,
+  generatePdf,
+  type PdfData,
+} from "../api/products";
 
 function ConfiguratorPage() {
   const { products, loading, getAll } = useProductsConfigurator();
+  const { t } = useTranslation();
+  const { showSuccess, showError } = useToast();
 
   useEffect(() => {
     getAll();
@@ -29,8 +39,9 @@ function ConfiguratorPage() {
 
   const contains = (arr: string | string[] | undefined, val: string) => {
     if (val === "All" || !arr) return true;
-    if (typeof arr === "string") return arr.toLowerCase() === val.toLowerCase();
-    return arr.some((x) => x.toLowerCase() === val.toLowerCase());
+    if (typeof arr === "string")
+      return arr.toLowerCase().includes(val.toLowerCase());
+    return arr.some((x) => x.toLowerCase().includes(val.toLowerCase()));
   };
 
   const filteredProducts = products.filter(
@@ -45,30 +56,69 @@ function ConfiguratorPage() {
   }, [selectedProduct, tilesH, tilesV, unit]);
 
   const [modalAction, setModalAction] = useState<ModalAction>(null);
-  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
 
   const handleActionClick = (action: ModalAction) => {
     if (!selectedProduct || !stats) {
-      alert("Please select a product first to configure the screen.");
+      showError(t("notSelectedProductError"));
       return;
     }
     setModalAction(action);
   };
 
-  const handleFormSubmit = (formData: any) => {
+  const handleFormSubmit = async (formData: any) => {
+    if (!selectedProduct) {
+      throw new Error("No product selected");
+    }
     if (modalAction === "pdf") {
-      console.log("Saving PDF...", selectedProduct, formData);
-      // Lógica de PDF aquí
+      try {
+        const pdfData: PdfData = {
+          productId: selectedProduct.id,
+          tilesH,
+          tilesV,
+          unit,
+        };
+        const pdfBlob = await generatePdf(pdfData);
+
+        // Crear URL del blob y descargar
+        const url = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `led-configuration-${selectedProduct?.name.replace(/\s+/g, "-").toLowerCase()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        showSuccess(t("pdfDownloaded"));
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        showError(t("pdfFailed"));
+      }
     } else if (modalAction === "quote") {
-      console.log("Requesting Quote...", selectedProduct, formData);
-      // Lógica de envío al backend aquí
+      try {
+        const quoteData: QuoteData = {
+          ...formData,
+          productId: selectedProduct?.id,
+          tilesH,
+          tilesV,
+          unit,
+        };
+        await sendQuoteRequest(quoteData);
+        showSuccess(t("quoteSent"));
+      } catch (error) {
+        console.error("Error sending quote:", error);
+        showError(t("quoteFailed"));
+      }
     }
     setModalAction(null); // Cerramos el modal
   };
 
   const copyResultsToClipboard = () => {
     if (!selectedProduct || !stats) {
-      alert("Select a product and configure dimensions to copy results.");
+      showError(t("notSelectedProductError"));
       return;
     }
 
@@ -91,10 +141,12 @@ function ConfiguratorPage() {
       .writeText(lines.join("\n"))
       .then(() => {
         setCopyStatus("copied");
+        showSuccess(t("copied"));
         setTimeout(() => setCopyStatus("idle"), 1800);
       })
       .catch(() => {
         setCopyStatus("failed");
+        showError(t("copyFailed"));
         setTimeout(() => setCopyStatus("idle"), 1800);
       });
   };
@@ -102,7 +154,7 @@ function ConfiguratorPage() {
   return (
     <>
       <div className="title-row">
-        <h1 className="page-title">Led Screen Configurator</h1>
+        <h1 className="page-title">{t("appTitle")}</h1>
       </div>
 
       <main className="configurator-container">
@@ -110,11 +162,11 @@ function ConfiguratorPage() {
           {/* 1. PRODUCT */}
           <aside className="cfg-panel panel-product">
             <div className="panel-header">
-              <h3>1. Choose a product</h3>
+              <h3>{t("chooseProduct")}</h3>
             </div>
             <div className="panel-body">
               {loading ? (
-                <div className="cfg-loading">Loading products...</div>
+                <div className="cfg-loading">{t("loading")}</div>
               ) : (
                 <>
                   <ProductFilters filters={filters} setFilters={setFilters} />
@@ -131,7 +183,7 @@ function ConfiguratorPage() {
           {/* 2. DIMENSIONS */}
           <section className="cfg-panel panel-dimensions">
             <div className="panel-header">
-              <h3>2. Dimensions</h3>
+              <h3>{t("dimensions")}</h3>
             </div>
             <div className="panel-body">
               {selectedProduct ? (
@@ -145,7 +197,7 @@ function ConfiguratorPage() {
                   product={selectedProduct}
                 />
               ) : (
-                <p className="cfg-placeholder">Select a product first.</p>
+                <p className="cfg-placeholder">{t("selectProductFirst")}</p>
               )}
             </div>
           </section>
@@ -153,18 +205,18 @@ function ConfiguratorPage() {
           {/* 3. RESULTS */}
           <section className="cfg-panel panel-results">
             <div className="panel-header results-header-wrap">
-              <h3>3. Results</h3>
+              <h3>{t("results")}</h3>
               <div className="copy-action-wrap">
                 <button
                   type="button"
                   className="btn-copy"
                   onClick={copyResultsToClipboard}
                 >
-                  Copy in clipboard
+                  {t("copyResults")}
                 </button>
                 <span className={`copy-feedback ${copyStatus}`}>
-                  {copyStatus === "copied" && "Copied!"}
-                  {copyStatus === "failed" && "Copy failed"}
+                  {copyStatus === "copied" && t("copied")}
+                  {copyStatus === "failed" && t("copyFailed")}
                 </span>
               </div>
             </div>
@@ -172,7 +224,7 @@ function ConfiguratorPage() {
               {selectedProduct && stats ? (
                 <ResultsData product={selectedProduct} stats={stats} />
               ) : (
-                <p className="cfg-placeholder">No product selected.</p>
+                <p className="cfg-placeholder">{t("noProductSelected")}</p>
               )}
             </div>
           </section>
@@ -180,7 +232,7 @@ function ConfiguratorPage() {
           {/* 4. CANVAS */}
           <section className="cfg-panel panel-canvas">
             <div className="panel-header">
-              <h3>4. Canvas</h3>
+              <h3>{t("realTimeSimulator")}</h3>
             </div>
             <div className="panel-body panel-body--canvas">
               {selectedProduct && stats ? (
@@ -192,9 +244,7 @@ function ConfiguratorPage() {
                   unit={unit}
                 />
               ) : (
-                <p className="cfg-placeholder">
-                  Select a product to see preview.
-                </p>
+                <p className="cfg-placeholder">{t("selectProductToPreview")}</p>
               )}
             </div>
           </section>
@@ -204,13 +254,13 @@ function ConfiguratorPage() {
             className="btn-action"
             onClick={() => handleActionClick("pdf")}
           >
-            Save as PDF
+            {t("saveAsPdf")}
           </button>
           <button
             className="btn-action btn-action-primary"
             onClick={() => handleActionClick("quote")}
           >
-            Request a Quote
+            {t("requestQuote")}
           </button>
         </div>
 

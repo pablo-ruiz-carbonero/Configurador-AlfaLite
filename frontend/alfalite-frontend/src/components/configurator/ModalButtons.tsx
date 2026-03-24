@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Stats } from "../../utils/calculateStats";
 import type { Product } from "../../types/product";
 
@@ -15,17 +16,18 @@ interface ModalButtonsProps {
 export default function ModalButtons({
   actionType,
   selectedProduct,
-  stats,
   onSubmit,
   onClose,
 }: ModalButtonsProps) {
+  const { t } = useTranslation();
+
   const formFields = [
-    { name: "firstName", label: "First Name", type: "text" },
-    { name: "lastName", label: "Last Name", type: "text" },
-    { name: "email", label: "Email", type: "email" },
-    { name: "phone", label: "Phone", type: "text" },
-    { name: "company", label: "Company", type: "text" },
-    { name: "project", label: "Project Name", type: "text" },
+    { name: "firstName", label: t("firstName"), type: "text" },
+    { name: "lastName", label: t("lastName"), type: "text" },
+    { name: "email", label: t("email"), type: "email" },
+    { name: "phone", label: t("phone"), type: "text" },
+    { name: "company", label: t("company"), type: "text" },
+    { name: "project", label: t("project"), type: "text" },
   ];
 
   const [formData, setFormData] = useState(
@@ -40,8 +42,8 @@ export default function ModalButtons({
   };
 
   const title =
-    actionType === "pdf" ? "Download PDF Details" : "Request a Quote";
-  const btnText = actionType === "pdf" ? "Generate PDF" : "Send Request";
+    actionType === "pdf" ? t("modalTitlePDF") : t("modalTitleQuote");
+  const btnText = actionType === "pdf" ? t("generatePdf") : t("sendRequest");
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -51,8 +53,7 @@ export default function ModalButtons({
         </button>
         <h2>{title}</h2>
         <p className="modal-subtitle">
-          Please fill in your details for the{" "}
-          <strong>{selectedProduct?.name}</strong> configuration.
+          {t("modalInstructions", { product: selectedProduct?.name || "" })}
         </p>
 
         <form className="modal-form">
@@ -72,22 +73,22 @@ export default function ModalButtons({
           </div>
 
           <label>
-            Assembly:
+            {t("assembly")}:
             <select
               name="assembly"
               value={formData.assembly || ""}
               onChange={handleChange}
             >
-              <option value="">Select Assembly</option>
-              <option value="indoor">Indoor</option>
-              <option value="outdoor">Outdoor</option>
+              <option value="">{t("selectAssembly")}</option>
+              <option value="indoor">{t("indoor")}</option>
+              <option value="outdoor">{t("outdoor")}</option>
             </select>
           </label>
         </form>
 
         <div className="modal-actions">
           <button type="button" className="btn-cancel" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </button>
           <button
             type="button"

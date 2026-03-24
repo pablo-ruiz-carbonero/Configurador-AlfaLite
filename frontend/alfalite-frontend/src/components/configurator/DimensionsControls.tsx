@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { Product } from "../../types/product";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   tilesH: number;
@@ -33,9 +34,12 @@ function DimensionControls({
   const [horizontalMode, setHorizontalMode] = useState<HorizontalMode>("tiles");
   const [aspectA, setAspectA] = useState(16);
   const [aspectB, setAspectB] = useState(9);
+  const { t } = useTranslation();
 
-  const toMm = (value: number) => (unit === "ft" ? value / FT_TO_M * 1000 : value * 1000);
-  const fromMm = (valueMm: number) => (unit === "ft" ? valueMm / 1000 * FT_TO_M : valueMm / 1000);
+  const toMm = (value: number) =>
+    unit === "ft" ? (value / FT_TO_M) * 1000 : value * 1000;
+  const fromMm = (valueMm: number) =>
+    unit === "ft" ? (valueMm / 1000) * FT_TO_M : valueMm / 1000;
 
   const clamp = (v: number) => Math.min(100, Math.max(1, Math.round(v)));
 
@@ -66,8 +70,10 @@ function DimensionControls({
       const widthUnits = fromMm(tilesH * effectiveProduct.width);
       setTilesHInput(String(Math.round(widthUnits)));
     } else if (horizontalMode === "surface" && effectiveProduct) {
-      const surfaceM2 = (tilesH * effectiveProduct.width / 1000) * (tilesV * effectiveProduct.height / 1000);
-      const value = unit === "ft" ? surfaceM2 / (FT_TO_M ** 2) : surfaceM2;
+      const surfaceM2 =
+        ((tilesH * effectiveProduct.width) / 1000) *
+        ((tilesV * effectiveProduct.height) / 1000);
+      const value = unit === "ft" ? surfaceM2 / FT_TO_M ** 2 : surfaceM2;
       setTilesHInput(String(Math.round(value)));
     } else if (horizontalMode === "diagonal" && effectiveProduct) {
       const wMm = tilesH * effectiveProduct.width;
@@ -160,9 +166,9 @@ function DimensionControls({
           value={verticalMode}
           onChange={(e) => setVerticalMode(e.target.value as VerticalMode)}
         >
-          <option value="tiles">Tiles vertical</option>
-          <option value="height">Height ({unit})</option>
-          <option value="aspect">Aspect ratio</option>
+          <option value="tiles">{t("verticalTiles")}</option>
+          <option value="height">{t("verticalHeight", { unit })}</option>
+          <option value="aspect">{t("verticalAspect")}</option>
         </select>
 
         {verticalMode !== "aspect" ? (
@@ -205,14 +211,20 @@ function DimensionControls({
               step={1}
               value={aspectA}
               onChange={(e) => {
-                const value = Math.max(1, Math.min(100, Math.round(Number(e.target.value))));
+                const value = Math.max(
+                  1,
+                  Math.min(100, Math.round(Number(e.target.value))),
+                );
                 setAspectA(value);
                 if (value > 0 && aspectB > 0) {
                   setTilesV(clamp(Math.round((tilesH * aspectB) / value)));
                 }
               }}
             />
-            <span style={{ color: "var(--text-main)" }}> : </span>
+            <span style={{ color: "var(--text-main)" }}>
+              {" "}
+              {t("aspectSeparator")}{" "}
+            </span>
             <input
               type="number"
               min={1}
@@ -220,7 +232,10 @@ function DimensionControls({
               step={1}
               value={aspectB}
               onChange={(e) => {
-                const value = Math.max(1, Math.min(100, Math.round(Number(e.target.value))));
+                const value = Math.max(
+                  1,
+                  Math.min(100, Math.round(Number(e.target.value))),
+                );
                 setAspectB(value);
                 if (aspectA > 0 && value > 0) {
                   setTilesV(clamp(Math.round((tilesH * value) / aspectA)));
@@ -237,10 +252,14 @@ function DimensionControls({
           value={horizontalMode}
           onChange={(e) => setHorizontalMode(e.target.value as HorizontalMode)}
         >
-          <option value="tiles">Tiles horizontal</option>
-          <option value="width">Width ({unit})</option>
-          <option value="surface">Surface ({unit === "ft" ? "ft²" : "m²"})</option>
-          <option value="diagonal">Diagonal ({unit})</option>
+          <option value="tiles">{t("horizontalTiles")}</option>
+          <option value="width">{t("horizontalWidth", { unit })}</option>
+          <option value="surface">
+            {t("horizontalSurface", {
+              surfaceUnit: unit === "ft" ? "ft²" : "m²",
+            })}
+          </option>
+          <option value="diagonal">{t("horizontalDiagonal", { unit })}</option>
         </select>
         <div className="slider-row">
           <input
@@ -274,7 +293,7 @@ function DimensionControls({
             checked={unit === "m"}
             onChange={() => setUnit("m")}
           />
-          Meters
+          {t("unitMeters")}
         </label>
         <label>
           <input
@@ -282,7 +301,7 @@ function DimensionControls({
             checked={unit === "ft"}
             onChange={() => setUnit("ft")}
           />
-          Feet
+          {t("unitFeet")}
         </label>
       </div>
     </div>

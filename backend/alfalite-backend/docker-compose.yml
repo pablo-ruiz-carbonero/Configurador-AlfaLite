@@ -12,13 +12,15 @@ services:
       - postgres_data_dev:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     ports:
-      - "5432:5432" # Expuesto para que puedas conectarte con DBeaver/PgAdmin
+      - "5432:5432" # Expuesto para que pueda conectarme con DBeaver/PgAdmin
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_ADMIN_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: alfalite-mailhog
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI
+    restart: unless-stopped
 
 volumes:
   postgres_data_dev:

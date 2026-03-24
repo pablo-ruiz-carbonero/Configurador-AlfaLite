@@ -1,9 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import type { JSX } from "react";
 import { lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
 import ConfiguratorPage from "./pages/ConfiguratorPage";
+import "./App.css";
+import { CustomSelect } from "./components/CustomLaguageSelect";
 
-// Componente para proteger la ruta
+const LANGUAGES = [
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+];
+
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem("alfalite_token");
   if (!token) return <Navigate to="/admin" />;
@@ -27,9 +34,19 @@ const AuthPage = lazy(() => import("./pages/Auth"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 function App() {
+  const { t, i18n } = useTranslation();
+
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className="loading">Cargando Página...</div>}>
+      <div className="language-switcher">
+        <span className="lang-label">{t("language")}:</span>
+        <CustomSelect
+          options={LANGUAGES}
+          value={i18n.language.split("-")[0]}
+          onChange={(code) => i18n.changeLanguage(code)}
+        />
+      </div>
+      <Suspense fallback={<div className="loading">{t("loading")}</div>}>
         <Routes>
           <Route path="/" element={<ConfiguratorPage />} />
           <Route

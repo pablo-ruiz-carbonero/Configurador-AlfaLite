@@ -6,23 +6,31 @@ interface ResultsDataProps {
   stats: Stats;
 }
 
+import { useTranslation } from "react-i18next";
+
+interface ResultsDataProps {
+  product: Product;
+  stats: Stats;
+}
+
 function ResultsData({ product, stats }: ResultsDataProps) {
+  const { t } = useTranslation();
   const u = stats.dimUnit;
 
   return (
     <div className="results-table">
       <div className="result-row">
-        <span>Product:</span>
+        <span>{t("resultProduct")}</span>
         <strong>{product.name}</strong>
       </div>
       <div className="result-row">
-        <span>Resolution:</span>
+        <span>{t("resultResolution")}</span>
         <strong>
           {stats.resH} x {stats.resV} px
         </strong>
       </div>
       <div className="result-row">
-        <span>Dimensions:</span>
+        <span>{t("resultDimensions")}</span>
         <strong>
           {stats.widthM.toFixed(2)} x {stats.heightM.toFixed(2)} x{" "}
           {stats.depth.toFixed(2)} {u}
@@ -35,39 +43,39 @@ function ResultsData({ product, stats }: ResultsDataProps) {
         </strong>
       </div>
       <div className="result-row">
-        <span>Aspect ratio:</span>
+        <span>{t("resultAspectRatio")}</span>
         <strong>{stats.aspect}</strong>
       </div>
       <div className="result-row">
-        <span>Surface:</span>
+        <span>{t("resultSurface")}</span>
         <strong>
           {stats.surface.toFixed(2)} {stats.surfaceUnit}
         </strong>
       </div>
       <div className="result-row">
-        <span>Max. power consumption:</span>
+        <span>{t("resultMaxPower")}</span>
         <strong>{stats.powerMax.toFixed(2)} kW</strong>
       </div>
       <div className="result-row">
-        <span>Avg. power consumption:</span>
+        <span>{t("resultAvgPower")}</span>
         <strong>{stats.powerAvg.toFixed(2)} kW</strong>
       </div>
       <div className="result-row">
-        <span>Weight:</span>
+        <span>{t("resultWeight")}</span>
         <strong>{stats.weight.toFixed(2)} kg</strong>
       </div>
       <div className="result-row">
-        <span>Opt. view distance:</span>
+        <span>{t("resultOptViewDistance")}</span>
         <strong>
           &gt;{stats.optViewDistance.toFixed(2)} {u}
         </strong>
       </div>
       <div className="result-row">
-        <span>Brightness:</span>
+        <span>{t("resultBrightness")}</span>
         <strong>{product.brightness ?? 0} cd/m2</strong>
       </div>
       <div className="result-row">
-        <span>Total tiles:</span>
+        <span>{t("resultTotalTiles")}</span>
         <strong>{stats.totalTiles}</strong>
       </div>
     </div>
