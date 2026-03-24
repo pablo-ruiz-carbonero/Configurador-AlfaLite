@@ -3,11 +3,15 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
+import { WinstonLoggerService } from './common/logger/logger.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 async function bootstrap() {
-  const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const winstonLogger = new WinstonLoggerService();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: winstonLogger,
+  });
 
   // validación global de los DTOs; elimina campos extra y transforma tipos
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
@@ -31,6 +35,6 @@ async function bootstrap() {
   // join(process.cwd()) apunta a la raíz real de tu proyecto (donde está package.json)
   app.useStaticAssets(join(process.cwd(), 'uploads'));
   await app.listen(1337);
-  logger.log('Server listening on http://localhost:1337');
+  winstonLogger.log('Server listening on http://localhost:1337', 'Bootstrap');
 }
 bootstrap();

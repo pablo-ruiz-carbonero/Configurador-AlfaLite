@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Stats } from "../../utils/calculateStats";
 import type { Product } from "../../types/product";
+import "./css/ModalButtons.css";
+import "./css/Modal.css";
 
 export type ModalAction = "pdf" | "quote" | null;
 

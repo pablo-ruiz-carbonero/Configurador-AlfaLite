@@ -50,7 +50,14 @@ export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
     <ToastContext.Provider
       value={{ showSuccess, showError, showInfo, showLoading, updateToast }}
     >
-      <Toaster position="bottom-right" richColors />
+      <Toaster
+        position="bottom-right"
+        richColors
+        toastOptions={{
+          className: "alfalite-toast",
+          duration: 3500,
+        }}
+      />
       {children}
     </ToastContext.Provider>
   );

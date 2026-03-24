@@ -51,6 +51,36 @@ TypeOrmModule.forRootAsync({
 
 Las variables de entorno obligatorias se definen en el archivo `.env` en la raíz del directorio backend.
 
+## Manejo Global de Excepciones
+
+Se implementa un filtro global de excepciones (`AllExceptionsFilter`) registrado en `app.module.ts` para estandarizar todas las respuestas de error en la API. Este filtro captura cualquier excepción no manejada y devuelve una respuesta JSON consistente con el siguiente formato:
+
+```json
+{
+  "statusCode": 404,
+  "timestamp": "2023-10-01T12:00:00.000Z",
+  "path": "/api/dashboard/products/999",
+  "message": "Producto #999 no existe",
+  "error": "Not Found"
+}
+```
+
+El filtro maneja automáticamente excepciones de NestJS (`HttpException`, `NotFoundException`, etc.) y errores genéricos, asegurando consistencia en el formato de respuesta y centralizando el logging de errores.
+
+## Logging Centralizado con Winston
+
+Se implementa un sistema de logging centralizado usando Winston para monitoreo en producción. El sistema incluye:
+
+- **Servicio WinstonLoggerService**: Configurado con transports para consola (desarrollo) y archivos rotativos (producción)
+- **Niveles de log**: DEBUG (desarrollo), INFO (operaciones normales), WARN (advertencias), ERROR (errores)
+- **Formato JSON estructurado**: Incluye timestamp, contexto y metadatos para fácil parsing en herramientas de monitoreo
+- **Logging en servicios críticos**:
+  - Autenticación: Intentos de login/register, éxitos y fallos
+  - Configurador: Operaciones de cotización, envío de emails y generación de PDFs
+  - Excepciones: Logging mejorado en el filtro global con contexto de request
+
+Los logs se escriben en archivos `error.log` y `combined.log` en producción, configurables vía variables de entorno `LOG_LEVEL` y `LOG_DIR`.
+
 ## Sistema de Autenticación
 
 El sistema implementa:
@@ -257,17 +287,19 @@ EMAIL_FROM=noreply@alfalite.com
 
 # Puertos de servidor
 PORT=1337
+
+# Logging
+LOG_LEVEL=info
+LOG_DIR=logs
 ```
 
 ## Mejoras Futuras
 
-1. Implementar logging centralizado con Winston para monitoreo en producción
-2. Agregar filtro global de excepciones para estandarizar respuestas de error
-3. Implementar soporte para subida de imágenes de productos con validación
-4. Añadir paginación y búsqueda avanzada en listados de productos
-5. Implementar caché distribuido con Redis para optimizar consultas frecuentes
-6. Agregar rate limiting por IP para proteger endpoints públicos
-7. Implementar auditoría de cambios en base de datos con triggering
-8. Agregar validación de dominios de email en las solicitudes de cotización
+1. Implementar soporte para subida de imágenes de productos con validación
+2. Añadir paginación y búsqueda avanzada en listados de productos
+3. Implementar caché distribuido con Redis para optimizar consultas frecuentes
+4. Agregar rate limiting por IP para proteger endpoints públicos
+5. Implementar auditoría de cambios en base de datos con triggering
+6. Agregar validación de dominios de email en las solicitudes de cotización
 
 ---

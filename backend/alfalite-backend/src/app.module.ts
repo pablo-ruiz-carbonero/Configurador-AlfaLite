@@ -6,6 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApiModule } from './api/Dashboard/api.module';
 import { ApiModule as ConfiguratorApiModule } from './api/Configurator/api.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { WinstonModule } from 'nest-winston';
+import { WinstonLoggerService } from './common/logger/logger.service';
 
 @Module({
   imports: [
@@ -14,7 +18,12 @@ import { ApiModule as ConfiguratorApiModule } from './api/Configurator/api.modul
       isGlobal: true,
     }),
 
-    // 2. Configuración asíncrona de TypeORM
+    // 2. Winston para logging centralizado
+    WinstonModule.forRootAsync({
+      useClass: WinstonLoggerService,
+    }),
+
+    // 3. Configuración asíncrona de TypeORM
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,12 +39,18 @@ import { ApiModule as ConfiguratorApiModule } from './api/Configurator/api.modul
       }),
     }),
 
-    // 3. Tus módulos
+    // 4. Tus módulos
     AuthModule,
     ApiModule,
     ConfiguratorApiModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}

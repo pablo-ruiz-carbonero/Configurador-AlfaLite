@@ -48,6 +48,8 @@
   "indoor": "Indoor",
   "outdoor": "Outdoor",
   "cancel": "Cancel",
+  "screenA": "Screen A",
+  "screenB": "Screen B",
   "sendRequest": "Send Request",
   "generatePdf": "Generate PDF",
   "NotFoundProductFilter": "No products found for those filters",
@@ -81,6 +83,11 @@
   "resultMaxPower":"Maximum Power",
   "resultAvgPower":"Average Power",
   "resultOptViewDistance":"Optimal Viewing Distance",
+  "resultDiagonal":"Diagonal",
   "resultTotalTiles":"Total Tiles",
-  "copyResults": "Copy Results"
+  "copyResults": "Copy Results",
+  "processWizard": "Processor Wizard",
+  "wizardComplete": "Wizard completed successfully!",
+  "comparisonOn": "Enable comparison",
+  "comparisonOff": "Disable comparison"
 }

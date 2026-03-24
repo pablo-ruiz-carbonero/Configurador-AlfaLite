@@ -1,0 +1,57 @@
+/* ScreenCanvas.css */
+.canvas-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+}
+
+.human-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-bottom: 22px;
+}
+.human-wrap svg {
+  fill: #444;
+}
+
+.screen-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.screen-grid {
+  display: grid;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.screen-tile {
+  background: #1a3a2a;
+  box-shadow: inset 0 0 0 0.5px #0a2a1a;
+}
+
+.canvas-label-h {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.canvas-label-v {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 0 4px;
+  white-space: nowrap;
+  align-self: center;
+}

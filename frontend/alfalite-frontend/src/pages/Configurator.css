@@ -171,6 +171,92 @@ body {
   justify-content: center;
 }
 
+.comparison-title {
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.controls-header {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.product-selector-b {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.product-selector-b h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-screen {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-screen:hover:not(:disabled) {
+  background: var(--primary);
+  color: #000;
+}
+
+.btn-screen.active {
+  background: var(--primary);
+  color: #000;
+}
+
+.btn-screen:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.results-compare,
+.canvas-compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.results-pane,
+.canvas-pane,
+.comparison-block {
+  flex: 1 1 48%;
+  min-width: 280px;
+}
+
+.panel-header-with-compare {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel-header-with-compare .btn-copy {
+  white-space: nowrap;
+}
+
+.btn-copy.active {
+  background: var(--primary);
+  color: #000;
+}
+
 /* Áreas del grid */
 .panel-product {
   grid-area: product;
@@ -224,514 +310,6 @@ body {
 .btn-copy:hover {
   background: var(--primary);
   color: #000;
-}
-
-/* =============================================
-   1. PANEL PRODUCTO – lista y filtros
-   ============================================= */
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
-  flex-shrink: 0;
-  font-size: 12px;
-  color: var(--text-main);
-}
-
-.filter-group select {
-  width: 100%;
-  font-size: 12px;
-  padding: 4px 6px;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  color: var(--text-main);
-}
-.filter-group select option {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-.lista-de-productos {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-height: 0;
-}
-
-.product-item-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition:
-    border-color var(--transition),
-    background var(--transition);
-}
-.product-item-card:hover {
-  border-color: var(--primary-hover);
-}
-.product-item-card.active {
-  border-color: var(--primary);
-  background: rgba(255, 115, 3, 0.08);
-}
-
-.product-item-card img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-}
-
-.item-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-.item-info h4 {
-  margin: 0 0 2px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--primary);
-}
-
-/* =============================================
-   2. PANEL DIMENSIONES – sliders
-   ============================================= */
-.dimension-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.slider-group select {
-  font-size: 12px;
-  padding: 3px 6px;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
-  background: var(--bg-input);
-  color: var(--text-main);
-  width: fit-content;
-}
-.slider-group select option {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-.slider-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.slider-row input[type="range"] {
-  flex: 1;
-  height: 5px;
-  cursor: pointer;
-  accent-color: var(--primary);
-}
-.slider-row input[type="number"] {
-  width: 54px;
-  font-size: 12px;
-  padding: 3px 5px;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  background: var(--bg-input);
-  color: var(--text-main);
-  flex-shrink: 0;
-}
-
-.unit-selector {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 12px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-glass);
-  color: var(--text-main);
-}
-.unit-selector label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-}
-
-/* =============================================
-   3. PANEL RESULTADOS – tabla de stats
-   ============================================= */
-.results-table {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.result-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 12px;
-  gap: 8px;
-  padding: 3px 0;
-  border-bottom: 1px solid var(--border-glass);
-  animation: fadeInUp 0.3s ease-out both;
-  animation-delay: calc(
-    var(--i, 0) * 40ms
-  ); /* añade style="--i:N" en cada fila */
-}
-.result-row:last-child {
-  border-bottom: none;
-}
-.result-row span {
-  color: var(--text-dim);
-  font-weight: 500;
-  flex-shrink: 0;
-}
-.result-row strong {
-  color: var(--primary);
-  font-weight: 600;
-  text-align: right;
-}
-
-/* =============================================
-   4. PANEL CANVAS – previsualización
-   ============================================= */
-.canvas-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-}
-
-.human-wrap {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  flex-shrink: 0;
-  padding-bottom: 22px;
-}
-.human-wrap svg {
-  fill: #444;
-}
-
-.screen-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.screen-grid {
-  display: grid;
-  gap: 2px;
-  padding: 3px;
-  border-radius: var(--radius-sm);
-}
-
-.screen-tile {
-  background: #1a3a2a;
-  box-shadow: inset 0 0 0 0.5px #0a2a1a;
-}
-
-.canvas-label-h {
-  font-size: 11px;
-  color: var(--text-dim);
-  text-align: center;
-}
-.canvas-label-v {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  font-size: 11px;
-  color: var(--text-dim);
-  padding: 0 4px;
-  white-space: nowrap;
-  align-self: center;
-}
-
-/* =============================================
-   5. BOTONES DE SECCIÓN
-   ============================================= */
-.btn-section {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.btn-section button {
-  padding: 8px 16px;
-  font-size: 12px;
-  border: 1px solid var(--primary);
-  border-radius: var(--radius-sm);
-  background: var(--border-glass);
-  color: var(--text-main);
-  cursor: pointer;
-  transition:
-    background var(--transition),
-    color var(--transition);
-}
-.btn-section button:hover {
-  background: var(--primary);
-  color: #000;
-}
-
-/* =============================================
-   6. BOTONES DE ACCIÓN PRINCIPALES
-   ============================================= */
-.main-action-section {
-  display: flex;
-  gap: 20px;
-  justify-content: flex-end;
-  margin-top: 30px;
-  width: 100%;
-  max-width: 1200px;
-  padding: 10px 0;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.btn-action {
-  position: relative;
-  padding: 14px 28px;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border-radius: var(--radius-md);
-  border: 2px solid var(--primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow: hidden;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    filter 0.25s ease;
-}
-
-/* Secundario (glass) */
-.btn-action:not(.btn-action-primary) {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
-}
-.btn-action:not(.btn-action-primary):hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.05);
-}
-
-/* Primario (naranja) */
-.btn-action-primary {
-  background: var(--primary);
-  color: #000;
-  box-shadow: 0 4px 15px var(--primary-glow);
-}
-.btn-action-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 28px var(--primary-glow);
-  filter: brightness(1.1);
-}
-.btn-action:active {
-  transform: translateY(0);
-}
-
-/* Shimmer en hover sobre botón primario */
-.btn-action-primary::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.15) 50%,
-    transparent 60%
-  );
-  transform: translateX(-100%);
-  transition: transform 0.45s ease;
-}
-.btn-action-primary:hover::after {
-  transform: translateX(100%);
-}
-
-/* =============================================
-   7. MODAL
-   ============================================= */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  animation: fadeIn 0.25s ease-out;
-}
-
-.modal {
-  background: linear-gradient(145deg, #1e1e1e, #121212);
-  border: 1px solid var(--border-glass);
-  border-left: 4px solid var(--primary);
-  border-radius: var(--radius-lg);
-  padding: 40px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 85vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-  animation: modalScaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.modal::-webkit-scrollbar {
-  width: 6px;
-}
-.modal::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 10px;
-}
-
-.modal h2 {
-  font-size: 24px;
-  margin-bottom: 8px;
-  background: linear-gradient(90deg, #fff, var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.modal-subtitle {
-  color: var(--text-muted);
-  font-size: 14px;
-  margin-bottom: 30px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 25px;
-}
-@media (max-width: 500px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.modal-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.modal-form input,
-.modal-form select {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  color: #fff;
-  font-size: 14px;
-  transition:
-    border-color var(--transition),
-    background var(--transition),
-    box-shadow var(--transition);
-}
-.modal-form input:focus,
-.modal-form select:focus {
-  outline: none;
-  border-color: var(--primary);
-  background: rgba(255, 115, 3, 0.05);
-  box-shadow: 0 0 10px var(--primary-glow);
-}
-
-.modal-form select option {
-  background: #1a1a1a;
-  color: #fff;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 15px;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-glass);
-}
-
-.btn-cancel {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-weight: 600;
-  transition: color var(--transition);
-}
-.btn-cancel:hover {
-  color: #fff;
-}
-
-.btn-confirm {
-  background: var(--primary);
-  color: #000;
-  padding: 12px 25px;
-  border-radius: var(--radius-md);
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    filter var(--transition),
-    transform var(--transition);
-}
-.btn-confirm:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  cursor: pointer;
-  transition:
-    background var(--transition),
-    color var(--transition);
-}
-.close-btn:hover {
-  background: rgba(230, 50, 50, 0.2);
-  color: #ff4d4d;
 }
 
 /* =============================================

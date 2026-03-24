@@ -7,6 +7,7 @@ interface Props {
 }
 
 import { useTranslation } from "react-i18next";
+import "./css/ProductFilters.css";
 
 function ProductFilters({ filters, setFilters }: Props) {
   const { t } = useTranslation();

@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { Product } from "../../types/product";
+import "./css/ProductList.css";
 
 interface ProductListProps {
   products: Product[];

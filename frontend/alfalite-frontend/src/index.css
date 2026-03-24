@@ -4,25 +4,25 @@
    ============================================= */
 
 :root {
-  --primary:        #ff7303;
-  --primary-hover:  #e66700;
-  --primary-glow:   rgba(255, 115, 3, 0.25);
-  --primary-rgb:    255, 115, 3;
+  --primary: #ff7303;
+  --primary-hover: #e66700;
+  --primary-glow: rgba(255, 115, 3, 0.25);
+  --primary-rgb: 255, 115, 3;
 
-  --bg-dark:        #050505;
-  --bg-panel:       rgba(255, 255, 255, 0.03);
-  --bg-input:       rgba(255, 255, 255, 0.05);
+  --bg-dark: #050505;
+  --bg-panel: rgba(255, 255, 255, 0.03);
+  --bg-input: rgba(255, 255, 255, 0.05);
 
-  --text-main:      #ffffff;
-  --text-dim:       rgba(255, 255, 255, 0.6);
-  --text-muted:     rgba(255, 255, 255, 0.35);
+  --text-main: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.35);
 
-  --border-glass:   rgba(255, 255, 255, 0.08);
+  --border-glass: rgba(255, 255, 255, 0.08);
   --border-primary: var(--primary);
 
-  --radius-sm:  4px;
-  --radius-md:  6px;
-  --radius-lg:  12px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
 
   --transition: 0.2s ease;
 }
@@ -178,4 +178,32 @@ body {
   50% {
     opacity: 1;
   }
+}
+
+/* --- TOAST SONNER (ALFALITE) --- */
+.alfalite-toast {
+  background: rgba(3, 3, 3, 0.85) !important;
+  border: 1px solid var(--border-glass) !important;
+  backdrop-filter: blur(12px);
+  color: var(--primary) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  font-family: "Inter", sans-serif;
+}
+
+.alfalite-toast .sonner-title {
+  color: var(--text-main) !important;
+  font-weight: 700;
+}
+
+.alfalite-toast .sonner-description {
+  color: var(--text-dim) !important;
+}
+
+.alfalite-toast.tonal {
+  border-left: 4px solid var(--primary);
+}
+
+.alfalite-toast .sonner-icon {
+  color: var(--primary) !important;
 }

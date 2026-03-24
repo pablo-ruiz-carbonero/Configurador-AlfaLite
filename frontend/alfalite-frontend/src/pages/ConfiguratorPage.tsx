@@ -11,6 +11,7 @@ import ResultsData from "../components/configurator/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
 import ScreenCanvas from "../components/configurator/ScreenCanvas";
 import ModalButtons from "../components/configurator/ModalButtons";
+import WizardModal from "../components/configurator/WizardModal";
 import type { ModalAction } from "../components/configurator/ModalButtons";
 import {
   sendQuoteRequest,
@@ -37,6 +38,35 @@ function ConfiguratorPage() {
   const [tilesV, setTilesV] = useState(9);
   const [unit, setUnit] = useState<Unit>("ft");
 
+  const [compareMode, setCompareMode] = useState(false);
+  const [activeScreen, setActiveScreen] = useState<"A" | "B">("A");
+  const [tilesH2, setTilesH2] = useState(16);
+  const [tilesV2, setTilesV2] = useState(9);
+  const [unit2, setUnit2] = useState<Unit>("ft");
+
+  type ActiveControlsType = {
+    tilesH: number;
+    tilesV: number;
+    unit: Unit;
+    setTilesH: (v: number) => void;
+    setTilesV: (v: number) => void;
+    setUnit: (u: Unit) => void;
+  };
+
+  const activeControls: ActiveControlsType = useMemo(() => {
+    const isA = activeScreen === "A";
+    return {
+      tilesH: isA ? tilesH : tilesH2,
+      tilesV: isA ? tilesV : tilesV2,
+      unit: isA ? unit : unit2,
+      setTilesH: (value: number) =>
+        isA ? setTilesH(value) : setTilesH2(value),
+      setTilesV: (value: number) =>
+        isA ? setTilesV(value) : setTilesV2(value),
+      setUnit: (value: Unit) => (isA ? setUnit(value) : setUnit2(value)),
+    };
+  }, [activeScreen, tilesH, tilesV, unit, tilesH2, tilesV2, unit2]);
+
   const contains = (arr: string | string[] | undefined, val: string) => {
     if (val === "All" || !arr) return true;
     if (typeof arr === "string")
@@ -55,7 +85,13 @@ function ConfiguratorPage() {
     return calculateStats(selectedProduct, tilesH, tilesV, unit);
   }, [selectedProduct, tilesH, tilesV, unit]);
 
+  const stats2: Stats | null = useMemo(() => {
+    if (!selectedProduct || !compareMode) return null;
+    return calculateStats(selectedProduct, tilesH2, tilesV2, unit2);
+  }, [selectedProduct, tilesH2, tilesV2, unit2, compareMode]);
+
   const [modalAction, setModalAction] = useState<ModalAction>(null);
+  const [showWizard, setShowWizard] = useState(false);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
@@ -157,6 +193,36 @@ function ConfiguratorPage() {
         <h1 className="page-title">{t("appTitle")}</h1>
       </div>
 
+      <div className="wizard-container">
+        {selectedProduct ? (
+          <button
+            className="btn-action btn-action-primary"
+            onClick={() => setShowWizard(true)}
+            type="button"
+          >
+            {t("processWizard")}
+          </button>
+        ) : (
+          <button className="btn-action" disabled>
+            {t("processWizard")}
+          </button>
+        )}
+      </div>
+
+      <WizardModal
+        open={showWizard}
+        onClose={() => setShowWizard(false)}
+        product={selectedProduct ?? ({} as Product)}
+        stats={stats ?? ({} as Stats)}
+        tilesH={tilesH}
+        tilesV={tilesV}
+        unit={unit}
+        onFinished={() => {
+          showSuccess(t("wizardComplete"));
+          setShowWizard(false);
+        }}
+      />
+
       <main className="configurator-container">
         <div className="cfg-grid">
           {/* 1. PRODUCT */}
@@ -182,20 +248,46 @@ function ConfiguratorPage() {
 
           {/* 2. DIMENSIONS */}
           <section className="cfg-panel panel-dimensions">
-            <div className="panel-header">
+            <div className="panel-header panel-header-with-compare">
               <h3>{t("dimensions")}</h3>
+              <button
+                type="button"
+                className={`btn-copy ${compareMode ? "active" : ""}`}
+                onClick={() => setCompareMode((prev) => !prev)}
+              >
+                {compareMode ? t("comparisonOff") : t("comparisonOn")}
+              </button>
             </div>
             <div className="panel-body">
               {selectedProduct ? (
-                <DimensionControls
-                  tilesH={tilesH}
-                  tilesV={tilesV}
-                  setTilesH={setTilesH}
-                  setTilesV={setTilesV}
-                  unit={unit}
-                  setUnit={setUnit}
-                  product={selectedProduct}
-                />
+                <>
+                  <div className="controls-header">
+                    <button
+                      type="button"
+                      className={`btn-screen ${activeScreen === "A" ? "active" : ""}`}
+                      onClick={() => setActiveScreen("A")}
+                    >
+                      {t("screenA")}
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn-screen ${activeScreen === "B" ? "active" : ""}`}
+                      disabled={!compareMode}
+                      onClick={() => setActiveScreen("B")}
+                    >
+                      {t("screenB")}
+                    </button>
+                  </div>
+                  <DimensionControls
+                    tilesH={activeControls.tilesH}
+                    tilesV={activeControls.tilesV}
+                    setTilesH={activeControls.setTilesH}
+                    setTilesV={activeControls.setTilesV}
+                    unit={activeControls.unit}
+                    setUnit={activeControls.setUnit}
+                    product={selectedProduct}
+                  />
+                </>
               ) : (
                 <p className="cfg-placeholder">{t("selectProductFirst")}</p>
               )}
@@ -222,7 +314,11 @@ function ConfiguratorPage() {
             </div>
             <div className="panel-body">
               {selectedProduct && stats ? (
-                <ResultsData product={selectedProduct} stats={stats} />
+                <ResultsData
+                  product={selectedProduct}
+                  stats={stats}
+                  stats2={compareMode ? stats2 : undefined}
+                />
               ) : (
                 <p className="cfg-placeholder">{t("noProductSelected")}</p>
               )}
@@ -236,13 +332,38 @@ function ConfiguratorPage() {
             </div>
             <div className="panel-body panel-body--canvas">
               {selectedProduct && stats ? (
-                <ScreenCanvas
-                  tilesH={tilesH}
-                  tilesV={tilesV}
-                  product={selectedProduct}
-                  stats={stats}
-                  unit={unit}
-                />
+                compareMode && stats2 ? (
+                  <div className="canvas-compare">
+                    <div className="canvas-pane">
+                      <div className="comparison-title">{t("screenA")}</div>
+                      <ScreenCanvas
+                        tilesH={tilesH}
+                        tilesV={tilesV}
+                        product={selectedProduct}
+                        stats={stats}
+                        unit={unit}
+                      />
+                    </div>
+                    <div className="canvas-pane">
+                      <div className="comparison-title">{t("screenB")}</div>
+                      <ScreenCanvas
+                        tilesH={tilesH2}
+                        tilesV={tilesV2}
+                        product={selectedProduct}
+                        stats={stats2}
+                        unit={unit2}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <ScreenCanvas
+                    tilesH={tilesH}
+                    tilesV={tilesV}
+                    product={selectedProduct}
+                    stats={stats}
+                    unit={unit}
+                  />
+                )
               ) : (
                 <p className="cfg-placeholder">{t("selectProductToPreview")}</p>
               )}

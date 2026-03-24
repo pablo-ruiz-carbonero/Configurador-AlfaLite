@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Product } from "../../types/product";
 import { useTranslation } from "react-i18next";
+import "./css/DimensionsControls.css";
 
 interface Props {
   tilesH: number;

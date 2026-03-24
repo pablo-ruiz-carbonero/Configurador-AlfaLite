@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
@@ -10,6 +10,7 @@ import * as puppeteer from 'puppeteer';
 
 @Injectable()
 export class ApiService {
+  private readonly logger = new Logger(ApiService.name);
   private transporter: nodemailer.Transporter;
 
   constructor(
@@ -34,11 +35,19 @@ export class ApiService {
 
   async findOne(id: number) {
     const product = await this.productRepository.findOneBy({ id });
-    if (!product) throw new NotFoundException(`Producto #${id} no existe`);
+    if (!product) {
+      this.logger.warn(`Product not found: ${id}`);
+      throw new NotFoundException(`Producto #${id} no existe`);
+    }
+    this.logger.debug(`Product retrieved: ${id}`);
     return product;
   }
 
   async createQuote(createQuoteDto: CreateQuoteDto) {
+    this.logger.log(
+      `Creating quote for product ${createQuoteDto.productId} by ${createQuoteDto.firstName} ${createQuoteDto.lastName}`,
+    );
+
     const product = await this.findOne(createQuoteDto.productId);
     const stats = this.calculateStats(
       product,
@@ -53,9 +62,19 @@ export class ApiService {
       stats,
     );
 
-    await this.sendEmail(emailContent);
-
-    return { message: 'Quote request sent successfully' };
+    try {
+      await this.sendEmail(emailContent);
+      this.logger.log(
+        `Quote email sent successfully for ${createQuoteDto.firstName} ${createQuoteDto.lastName}`,
+      );
+      return { message: 'Quote request sent successfully' };
+    } catch (error) {
+      this.logger.error(
+        `Failed to send quote email for ${createQuoteDto.firstName} ${createQuoteDto.lastName}`,
+        error,
+      );
+      throw error;
+    }
   }
 
   private calculateStats(
@@ -149,10 +168,14 @@ Product Configuration:
       text: content,
     };
 
+    this.logger.debug(`Sending email to ${mailOptions.to}`);
     await this.transporter.sendMail(mailOptions);
+    this.logger.debug('Email sent successfully');
   }
 
   async createPdf(createPdfDto: CreatePdfDto) {
+    this.logger.log(`Generating PDF for product ${createPdfDto.productId}`);
+
     const product = await this.findOne(createPdfDto.productId);
     const stats = this.calculateStats(
       product,
@@ -163,29 +186,40 @@ Product Configuration:
 
     const htmlContent = this.generatePdfHtml(product, stats);
 
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    try {
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
 
-    const page = await browser.newPage();
-    await page.setContent(htmlContent);
-    await page.emulateMediaType('screen');
+      const page = await browser.newPage();
+      await page.setContent(htmlContent);
+      await page.emulateMediaType('screen');
 
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px',
-      },
-    });
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px',
+        },
+      });
 
-    await browser.close();
+      await browser.close();
 
-    return pdfBuffer;
+      this.logger.log(
+        `PDF generated successfully for product ${createPdfDto.productId}`,
+      );
+      return pdfBuffer;
+    } catch (error) {
+      this.logger.error(
+        `Failed to generate PDF for product ${createPdfDto.productId}`,
+        error,
+      );
+      throw error;
+    }
   }
 
   private generatePdfHtml(product: Product, stats: any) {

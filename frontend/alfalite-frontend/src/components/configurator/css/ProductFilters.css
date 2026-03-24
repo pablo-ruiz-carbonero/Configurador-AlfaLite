@@ -1,0 +1,24 @@
+/* ProductFilters.css */
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+.filter-group select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-main);
+}
+.filter-group select option {
+  background: #1a1a1a;
+  color: #fff;
+}
