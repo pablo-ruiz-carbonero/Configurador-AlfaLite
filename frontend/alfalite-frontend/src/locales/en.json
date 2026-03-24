@@ -48,8 +48,6 @@
   "indoor": "Indoor",
   "outdoor": "Outdoor",
   "cancel": "Cancel",
-  "screenA": "Screen A",
-  "screenB": "Screen B",
   "sendRequest": "Send Request",
   "generatePdf": "Generate PDF",
   "NotFoundProductFilter": "No products found for those filters",

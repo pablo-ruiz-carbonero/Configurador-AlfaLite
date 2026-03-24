@@ -184,21 +184,6 @@ body {
   margin-bottom: 10px;
 }
 
-.product-selector-b {
-  margin-bottom: 16px;
-  padding: 12px;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-sm);
-  background: var(--bg-secondary);
-}
-
-.product-selector-b h4 {
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-main);
-}
-
 .btn-screen {
   flex: 1;
   padding: 6px 10px;
