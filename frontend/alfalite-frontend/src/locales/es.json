@@ -86,6 +86,8 @@
   "processWizard": "Asistente de configuración del procesador",
   "wizardComplete": "¡Asistente completado correctamente!",
   "comparisonOn": "Activar comparación",
-  "comparisonOff": "Desactivar comparación"
+  "comparisonOff": "Desactivar comparación",
+  "screenA": "Pantalla A",
+  "screenB": "Pantalla B"
 
 }

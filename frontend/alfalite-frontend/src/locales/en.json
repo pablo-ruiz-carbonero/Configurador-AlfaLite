@@ -87,5 +87,7 @@
   "processWizard": "Processor Wizard",
   "wizardComplete": "Wizard completed successfully!",
   "comparisonOn": "Enable comparison",
-  "comparisonOff": "Disable comparison"
+  "comparisonOff": "Disable comparison",
+  "screenA": "Screen A",
+  "screenB": "Screen B"
 }

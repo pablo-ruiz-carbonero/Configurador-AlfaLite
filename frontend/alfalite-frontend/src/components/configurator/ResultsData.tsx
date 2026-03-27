@@ -10,7 +10,14 @@ interface ResultsDataProps {
 }
 
 function ResultsData({ product, stats, stats2 }: ResultsDataProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const localeMap: Record<string, string> = {
+    es: "es-ES",
+    en: "en-US",
+  };
+
+  const locale = localeMap[i18n.language] || "en-US";
 
   const resultRows = [
     { key: "product", label: t("resultProduct"), value: () => product.name },
@@ -23,12 +30,13 @@ function ResultsData({ product, stats, stats2 }: ResultsDataProps) {
       key: "dimensions",
       label: t("resultDimensions"),
       value: (s: Stats) =>
-        `${s.widthM.toFixed(2)} x ${s.heightM.toFixed(2)} x ${s.depth.toFixed(2)} ${s.dimUnit}`,
+        `${s.widthM.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} x ${s.heightM.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} x ${s.depth.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${s.dimUnit}`,
     },
     {
       key: "diagonal",
       label: t("resultDiagonal") ?? "Diagonal:",
-      value: (s: Stats) => `${s.diagonal.toFixed(2)} ${s.dimUnit}`,
+      value: (s: Stats) =>
+        `${s.diagonal.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${s.dimUnit}`,
     },
     {
       key: "aspect",
@@ -38,27 +46,32 @@ function ResultsData({ product, stats, stats2 }: ResultsDataProps) {
     {
       key: "surface",
       label: t("resultSurface"),
-      value: (s: Stats) => `${s.surface.toFixed(2)} ${s.surfaceUnit}`,
+      value: (s: Stats) =>
+        `${s.surface.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${s.surfaceUnit}`,
     },
     {
       key: "maxPower",
       label: t("resultMaxPower"),
-      value: (s: Stats) => `${s.powerMax.toFixed(2)} kW`,
+      value: (s: Stats) =>
+        `${s.powerMax.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`,
     },
     {
       key: "avgPower",
       label: t("resultAvgPower"),
-      value: (s: Stats) => `${s.powerAvg.toFixed(2)} kW`,
+      value: (s: Stats) =>
+        `${s.powerAvg.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kW`,
     },
     {
       key: "weight",
       label: t("resultWeight"),
-      value: (s: Stats) => `${s.weight.toFixed(2)} kg`,
+      value: (s: Stats) =>
+        `${s.weight.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kg`,
     },
     {
       key: "optViewDistance",
       label: t("resultOptViewDistance"),
-      value: (s: Stats) => `>${s.optViewDistance.toFixed(2)} ${s.dimUnit}`,
+      value: (s: Stats) =>
+        `>${s.optViewDistance.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${s.dimUnit}`,
     },
     {
       key: "brightness",
