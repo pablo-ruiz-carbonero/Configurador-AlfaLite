@@ -11,7 +11,7 @@ import ResultsData from "../components/configurator/ResultsData";
 import { calculateStats, type Stats, type Unit } from "../utils/calculateStats";
 import ScreenCanvas from "../components/configurator/ScreenCanvas";
 import ModalButtons from "../components/configurator/ModalButtons";
-import WizardModal from "../components/configurator/WizardModal";
+import { ProcessorWizard } from "../components/processorWizard";
 import type { ModalAction } from "../components/configurator/ModalButtons";
 import {
   sendQuoteRequest,
@@ -209,19 +209,18 @@ function ConfiguratorPage() {
         )}
       </div>
 
-      <WizardModal
-        open={showWizard}
-        onClose={() => setShowWizard(false)}
-        product={selectedProduct ?? ({} as Product)}
-        stats={stats ?? ({} as Stats)}
-        tilesH={tilesH}
-        tilesV={tilesV}
-        unit={unit}
-        onFinished={() => {
-          showSuccess(t("wizardComplete"));
-          setShowWizard(false);
-        }}
-      />
+      {showWizard && selectedProduct && stats && (
+        <ProcessorWizard
+          screenData={{
+            width: stats.resH,
+            height: stats.resV,
+            physicalWidth: stats.widthM,
+            physicalHeight: stats.heightM,
+            pixelPitch: selectedProduct.pixelPitch,
+          }}
+          onClose={() => setShowWizard(false)}
+        />
+      )}
 
       <main className="configurator-container">
         <div className="cfg-grid">

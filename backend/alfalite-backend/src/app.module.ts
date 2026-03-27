@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApiModule } from './api/Dashboard/api.module';
 import { ApiModule as ConfiguratorApiModule } from './api/Configurator/api.module';
+import { ProcessorModule } from './processor/processor.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { WinstonModule } from 'nest-winston';
@@ -43,6 +44,7 @@ import { WinstonLoggerService } from './common/logger/logger.service';
     AuthModule,
     ApiModule,
     ConfiguratorApiModule,
+    ProcessorModule,
   ],
   controllers: [AppController],
   providers: [
