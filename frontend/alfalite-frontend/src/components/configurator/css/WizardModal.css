@@ -103,12 +103,13 @@
 
 /* Wizard container for buttons */
 .wizard-container {
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  text-align: center;
   margin: 20px 0 10px;
 }
 
 .wizard-container button {
+  display: inline-flex;
   padding: 10px 16px;
   font-size: 0.9rem;
   border-radius: var(--radius-md);

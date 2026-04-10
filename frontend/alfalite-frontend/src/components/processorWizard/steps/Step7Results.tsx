@@ -61,109 +61,197 @@ const Step7Results: React.FC<Step7Props> = ({
   if (loading) {
     return (
       <div className="step-content">
-        <p>
-          {t("calculatingRecommendations", "Calculating recommendations...")}
-        </p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>
+            {t(
+              "calculatingRecommendations",
+              "Calculating recommendations..."
+            )}
+          </p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="step-content error">
-        <p>
-          {t("error")}: {error}
-        </p>
+      <div className="step-content error-container">
+        <div className="error-message">
+          <span className="error-icon">⚠️</span>
+          <p>
+            {t("error")}: {error}
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="step-content results">
-      <h3>{t("recommendedSolutions", "Recommended Solutions")}</h3>
+    <div className="step-content results-container">
+      <div className="results-header">
+        <h2>{t("recommendedSolutions", "Recommended Solutions")}</h2>
+        <p className="results-subtitle">
+          {t(
+            "selectBestSolution",
+            "Choose the solution that best fits your needs"
+          )}
+        </p>
+      </div>
 
-      <div className="solutions-list">
-        {solutions.map((solution) => (
+      <div className="solutions-grid">
+        {solutions.map((solution, index) => (
           <div
             key={solution.id}
-            className={`solution-card ${selectedSolution?.id === solution.id ? "selected" : ""}`}
+            className={`solution-card ${
+              selectedSolution?.id === solution.id ? "selected" : ""
+            } ${index === 0 ? "recommended" : ""}`}
             onClick={() => onSelectSolution(solution)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSelectSolution(solution);
+            }}
           >
-            <div className="solution-header">
-              <h4>
-                #{solution.rank} - {solution.summary}
-              </h4>
-              <span className="solution-cost">
-                ${solution.totalCost.toLocaleString()}
-              </span>
-            </div>
-
-            <div className="solution-details">
-              <p className="solution-type">{solution.solutionType}</p>
-
-              <div className="cost-breakdown">
-                <p>
-                  <strong>{t("processors", "Processors")}:</strong> $
-                  {solution.costBreakdown.processors.toLocaleString()}
-                </p>
-                <p>
-                  <strong>{t("inputCards", "Input Cards")}:</strong> $
-                  {solution.costBreakdown.inputCards.toLocaleString()}
-                </p>
-                <p>
-                  <strong>{t("outputCards", "Output Cards")}:</strong> $
-                  {solution.costBreakdown.outputCards.toLocaleString()}
-                </p>
+            {index === 0 && (
+              <div className="recommended-badge">
+                ⭐ {t("recommended", "Recommended")}
               </div>
+            )}
 
-              <h5>{t("advantages", "Advantages")}:</h5>
-              <ul>
+            <div className="card-header">
+              <h3 className="solution-rank">#{solution.rank}</h3>
+              <div className="cost-badge">
+                ${solution.totalCost.toLocaleString()}
+              </div>
+            </div>
+
+            <div className="card-title">
+              <h4>{solution.summary}</h4>
+              <p className="solution-type">{solution.solutionType}</p>
+            </div>
+
+            <div className="separator"></div>
+
+            {/* Cost Breakdown */}
+            <div className="cost-section">
+              <h5>{t("costBreakdown", "Cost Breakdown")}</h5>
+              <div className="cost-items">
+                <div className="cost-item">
+                  <span className="cost-label">
+                    {t("processors", "Processors")}
+                  </span>
+                  <span className="cost-value">
+                    ${solution.costBreakdown.processors.toLocaleString()}
+                  </span>
+                </div>
+                <div className="cost-item">
+                  <span className="cost-label">
+                    {t("inputCards", "Input Cards")}
+                  </span>
+                  <span className="cost-value">
+                    ${solution.costBreakdown.inputCards.toLocaleString()}
+                  </span>
+                </div>
+                <div className="cost-item">
+                  <span className="cost-label">
+                    {t("outputCards", "Output Cards")}
+                  </span>
+                  <span className="cost-value">
+                    ${solution.costBreakdown.outputCards.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Advantages */}
+            <div className="advantages-section">
+              <h5>✓ {t("advantages", "Advantages")}</h5>
+              <ul className="benefits-list">
                 {solution.advantages.map((adv, i) => (
-                  <li key={i}>{adv}</li>
-                ))}
-              </ul>
-
-              <h5>{t("considerations", "Considerations")}:</h5>
-              <ul>
-                {solution.considerations.map((con, i) => (
-                  <li key={i}>{con}</li>
+                  <li key={i}>
+                    <span className="checkmark">✓</span>
+                    {adv}
+                  </li>
                 ))}
               </ul>
             </div>
+
+            {/* Considerations */}
+            <div className="considerations-section">
+              <h5>⚡ {t("considerations", "Considerations")}</h5>
+              <ul className="considerations-list">
+                {solution.considerations.map((con, i) => (
+                  <li key={i}>
+                    <span className="note-icon">•</span>
+                    {con}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button
+              className="select-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectSolution(solution);
+              }}
+            >
+              {selectedSolution?.id === solution.id
+                ? t("selected", "Selected")
+                : t("select", "Select")}
+            </button>
           </div>
         ))}
       </div>
 
       {selectedSolution && (
         <div className="action-section">
-          <h4>{t("sendConfiguration", "Send Configuration")}</h4>
-          <div className="email-input-group">
-            <input
-              type="email"
-              placeholder={t("enterEmailAddress", "Enter your email address")}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <div className="action-header">
+            <h3>{t("sendConfiguration", "Send Configuration")}</h3>
+            <p className="action-subtitle">
+              {t(
+                "shareYourConfiguration",
+                "Share your configuration via email"
+              )}
+            </p>
+          </div>
 
-            <button
-              onClick={handleSendEmail}
-              disabled={!email || sendingEmail}
-              className="btn-primary"
-            >
-              {sendingEmail
-                ? t("sending", "Sending...")
-                : t("sendEmail", "Send Email")}
-            </button>
+          <div className="email-section">
+            <div className="email-input-group">
+              <input
+                type="email"
+                placeholder={t(
+                  "enterEmailAddress",
+                  "Enter your email address"
+                )}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="email-input"
+              />
 
-            <button
-              onClick={handleSendQuote}
-              disabled={!email || sendingEmail}
-              className="btn-secondary"
-            >
-              {sendingEmail
-                ? t("sending", "Sending...")
-                : t("requestQuote", "Request Quote")}
-            </button>
+              <div className="button-group">
+                <button
+                  onClick={handleSendEmail}
+                  disabled={!email || sendingEmail}
+                  className="btn-send-email"
+                >
+                  {sendingEmail
+                    ? t("sending", "Sending...")
+                    : t("sendEmail", "Send Email")}
+                </button>
+
+                <button
+                  onClick={handleSendQuote}
+                  disabled={!email || sendingEmail}
+                  className="btn-request-quote"
+                >
+                  {sendingEmail
+                    ? t("sending", "Sending...")
+                    : t("requestQuote", "Request Quote")}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ import Step4InputSelection from "./steps/Step4InputSelection";
 import Step5OutputSelection from "./steps/Step5OutputSelection";
 import Step6Configuration from "./steps/Step6Configuration";
 import Step7Results from "./steps/Step7Results";
+import Step8Error from "./steps/Step8Error";
 import { useProcessorWizard } from "../../hooks/useProcessorWizard";
 import type {
   ScreenData,
@@ -29,7 +30,8 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
     screenData,
     selectedBrand: "NovaStar",
     selectedApplications: [],
-    selectedMainInputType: "HDMI",
+    selectedBitDepth: "8-bit",
+    selectedMainInputType: "HDMI-2.0",
     selectedAuxiliaryInputs: {},
     selectedOutputType: "RJ45",
     selectedAuxiliaryOutputs: {},
@@ -46,14 +48,22 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
     sendQuoteRequest,
   } = useProcessorWizard();
 
+  const isBrompton = formData.selectedBrand === "Brompton";
+  const totalSteps = isBrompton ? 4 : 7;
+  const resultsStep = isBrompton ? 4 : 7;
+  const isResultsPage = isBrompton ? currentStep === 4 : currentStep === 7;
+
   const handleNext = async () => {
-    if (currentStep === 6) {
-      // Last step before results - calculate solutions
+    const shouldCalculate =
+      (isBrompton && currentStep === 3) || (!isBrompton && currentStep === 6);
+
+    if (shouldCalculate) {
       try {
         await calculateSolutions(formData as CalculationRequest);
-        setCurrentStep(7);
+        setCurrentStep(resultsStep);
       } catch (err) {
         console.error("Error calculating solutions:", err);
+        setCurrentStep(8);
       }
     } else {
       setCurrentStep(currentStep + 1);
@@ -82,16 +92,38 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
           />
         );
       case 3:
-        return (
+        return isBrompton ? (
+          <Step6Configuration
+            brand="Brompton"
+            onConfigChange={(config) =>
+              updateFormData({ bromptonConfig: config })
+            }
+          />
+        ) : (
           <Step3ApplicationSelection
             selectedApplications={formData.selectedApplications || []}
+            selectedBitDepth={formData.selectedBitDepth || "8-bit"}
             onApplicationsChange={(apps) =>
               updateFormData({ selectedApplications: apps })
+            }
+            onBitDepthChange={(depth) =>
+              updateFormData({ selectedBitDepth: depth })
             }
           />
         );
       case 4:
-        return (
+        return isBrompton ? (
+          <Step7Results
+            solutions={solutions}
+            selectedSolution={selectedSolution}
+            loading={loading}
+            error={error}
+            onSelectSolution={selectSolution}
+            onSendEmail={sendConfigurationEmail}
+            onSendQuote={sendQuoteRequest}
+            screenData={screenData}
+          />
+        ) : (
           <Step4InputSelection
             selectedMainInput={formData.selectedMainInputType || "HDMI"}
             selectedAuxiliary={formData.selectedAuxiliaryInputs || {}}
@@ -121,11 +153,7 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
           <Step6Configuration
             brand={formData.selectedBrand || "NovaStar"}
             onConfigChange={(config) =>
-              updateFormData({
-                [formData.selectedBrand === "Brompton"
-                  ? "bromptonConfig"
-                  : "novastarConfig"]: config,
-              })
+              updateFormData({ novastarConfig: config })
             }
           />
         );
@@ -140,6 +168,34 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
             onSendEmail={sendConfigurationEmail}
             onSendQuote={sendQuoteRequest}
             screenData={screenData}
+          />
+        );
+      case 8:
+        return (
+          <Step8Error
+            brand={formData.selectedBrand || "NovaStar"}
+            errorMessage={
+              error ||
+              t(
+                "noSolutionsFound",
+                "No compatible processor solutions found for your configuration."
+              )
+            }
+            onRetry={() => setCurrentStep(isBrompton ? 3 : 6)}
+            onStartOver={() => {
+              setCurrentStep(1);
+              setFormData({
+                screenData,
+                selectedBrand: "NovaStar",
+                selectedApplications: [],
+                selectedBitDepth: "8-bit",
+                selectedMainInputType: "HDMI-2.0",
+                selectedAuxiliaryInputs: {},
+                selectedOutputType: "RJ45",
+                selectedAuxiliaryOutputs: {},
+              });
+            }}
+            onClose={onClose}
           />
         );
       default:
@@ -165,11 +221,11 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
           <div className="progress-bar">
             <div
               className="progress-fill"
-              style={{ width: `${(currentStep / 7) * 100}%` }}
+              style={{ width: `${(Math.min(currentStep, totalSteps) / totalSteps) * 100}%` }}
             ></div>
           </div>
           <p className="progress-text">
-            {t("step")} {currentStep} {t("of", "of")} 7
+            {t("step")} {Math.min(currentStep, totalSteps)} {t("of", "of")} {totalSteps}
           </p>
         </div>
 
@@ -179,7 +235,7 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
           <button
             className="btn-secondary"
             onClick={handlePrevious}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || currentStep === 8}
           >
             {t("previous", "Previous")}
           </button>
@@ -187,7 +243,7 @@ const ProcessorWizard: React.FC<ProcessorWizardProps> = ({
           <button
             className="btn-primary"
             onClick={handleNext}
-            disabled={currentStep === 7 || loading}
+            disabled={isResultsPage || currentStep === 8 || loading}
           >
             {loading ? t("calculating", "Calculating...") : t("next", "Next")}
           </button>

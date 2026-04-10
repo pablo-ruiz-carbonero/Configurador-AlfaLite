@@ -13,9 +13,10 @@ export interface CalculationRequest {
   screenData: ScreenData;
   selectedBrand: "NovaStar" | "Brompton";
   selectedApplications: string[];
+  selectedBitDepth?: string;
   selectedMainInputType: string;
   selectedAuxiliaryInputs: Record<string, number>;
-  selectedOutputType: "RJ45" | "OpticalFiber";
+  selectedOutputType: string;
   selectedAuxiliaryOutputs: Record<string, number>;
   bromptonConfig?: any;
   novastarConfig?: any;

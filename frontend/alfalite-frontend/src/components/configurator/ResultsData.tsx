@@ -7,6 +7,9 @@ interface ResultsDataProps {
   product: Product;
   stats: Stats;
   stats2?: Stats | null;
+  compareMode?: boolean;
+  onCopyScreen2?: () => void;
+  copyStatus2?: "idle" | "copied" | "failed";
 }
 
 function ResultsData({ product, stats, stats2 }: ResultsDataProps) {

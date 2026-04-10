@@ -95,6 +95,9 @@ function ConfiguratorPage() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
     "idle",
   );
+  const [copyStatus2, setCopyStatus2] = useState<"idle" | "copied" | "failed">(
+    "idle",
+  );
 
   const handleActionClick = (action: ModalAction) => {
     if (!selectedProduct || !stats) {
@@ -184,6 +187,42 @@ function ConfiguratorPage() {
         setCopyStatus("failed");
         showError(t("copyFailed"));
         setTimeout(() => setCopyStatus("idle"), 1800);
+      });
+  };
+
+  const copyScreen2ToClipboard = () => {
+    if (!selectedProduct || !stats2) {
+      showError(t("notSelectedProductError"));
+      return;
+    }
+
+    const lines = [
+      `Screen B`,
+      `Product: ${selectedProduct.name}`,
+      `Resolution: ${stats2.resH} x ${stats2.resV} px`,
+      `Dimensions: ${stats2.widthM.toFixed(2)} x ${stats2.heightM.toFixed(2)} x ${stats2.depth.toFixed(2)} ${stats2.dimUnit}`,
+      `Diagonal: ${stats2.diagonal.toFixed(2)} ${stats2.dimUnit}`,
+      `Aspect ratio: ${stats2.aspect}`,
+      `Surface: ${stats2.surface.toFixed(2)} ${stats2.surfaceUnit}`,
+      `Max. power consumption: ${stats2.powerMax.toFixed(2)} kW`,
+      `Avg. power consumption: ${stats2.powerAvg.toFixed(2)} kW`,
+      `Weight: ${stats2.weight.toFixed(2)} kg`,
+      `Opt. view distance: >${stats2.optViewDistance.toFixed(2)} ${stats2.dimUnit}`,
+      `Brightness: ${selectedProduct.brightness ?? 0} cd/m2`,
+      `Total tiles: ${stats2.totalTiles}`,
+    ];
+
+    navigator.clipboard
+      .writeText(lines.join("\n"))
+      .then(() => {
+        setCopyStatus2("copied");
+        showSuccess(t("copied"));
+        setTimeout(() => setCopyStatus2("idle"), 1800);
+      })
+      .catch(() => {
+        setCopyStatus2("failed");
+        showError(t("copyFailed"));
+        setTimeout(() => setCopyStatus2("idle"), 1800);
       });
   };
 
@@ -305,10 +344,25 @@ function ConfiguratorPage() {
                 >
                   {t("copyResults")}
                 </button>
+                {compareMode && stats2 && (
+                  <button
+                    type="button"
+                    className="btn-copy"
+                    onClick={copyScreen2ToClipboard}
+                  >
+                    {t("copyScreen2")}
+                  </button>
+                )}
                 <span className={`copy-feedback ${copyStatus}`}>
                   {copyStatus === "copied" && t("copied")}
                   {copyStatus === "failed" && t("copyFailed")}
                 </span>
+                {compareMode && stats2 && (
+                  <span className={`copy-feedback ${copyStatus2}`}>
+                    {copyStatus2 === "copied" && t("copied")}
+                    {copyStatus2 === "failed" && t("copyFailed")}
+                  </span>
+                )}
               </div>
             </div>
             <div className="panel-body">
